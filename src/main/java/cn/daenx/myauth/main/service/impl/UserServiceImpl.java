@@ -2,6 +2,7 @@ package cn.daenx.myauth.main.service.impl;
 
 import cn.daenx.myauth.main.entity.*;
 import cn.daenx.myauth.main.mapper.*;
+import cn.daenx.myauth.main.service.IEmailService;
 import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.util.MyUtils;
 import cn.daenx.myauth.util.RedisUtil;
@@ -23,7 +24,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -53,6 +56,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private VersionMapper versionMapper;
     @Resource
     private AdminMapper adminMapper;
+    @Resource
+    private IEmailService emailService;
     @Resource
     private RoleMapper roleMapper;
     @Value("${genKey}")
@@ -97,6 +102,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 jsonObject.put("user", user.getUser());
                 jsonObject.put("authTime", -1);
                 jsonObject.put("point", 0);
+                if(!CheckUtils.isObjectEmpty(user.getQq())){
+                    try {
+                        Map<String, Object> map = new HashMap<>();  // 页面的动态数据
+                        map.put("username", user.getUser());
+                        map.put("password", user.getPass());
+                        map.put("keyword", user.getCkey());
+                        map.put("data", "免费模式");
+                        map.put("qq", user.getQq());
+                        map.put("point", user.getPoint());
+                        emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{user.getQq()+"@qq.com"});
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
+                    }
+                }
                 return Result.ok("注册成功", jsonObject);
             } else {
                 return Result.error("注册失败");
@@ -129,6 +149,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     jsonObject.put("user", user.getUser());
                     jsonObject.put("authTime", user.getAuthTime());
                     jsonObject.put("point", 0);
+                    if(!CheckUtils.isObjectEmpty(user.getQq())){
+                        try {
+                            Map<String, Object> map = new HashMap<>();  // 页面的动态数据
+                            map.put("username", user.getUser());
+                            map.put("password", user.getPass());
+                            map.put("keyword", user.getCkey());
+                            if(user.getAuthTime().equals(-1)){
+                                map.put("data", "永久");
+                            }else {
+                                map.put("data", MyUtils.dateToStr(MyUtils.stamp2Date(user.getAuthTime().toString())));
+                            }
+                            map.put("qq", user.getQq());
+                            map.put("point", user.getPoint());
+                            emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{user.getQq()+"@qq.com"});
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
+                        }
+                    }
                     return Result.ok("注册成功", jsonObject);
                 } else {
                     return Result.error("注册失败");
@@ -183,6 +222,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     jsonObject.put("user", user.getUser());
                     jsonObject.put("authTime", user.getAuthTime());
                     jsonObject.put("point", user.getPoint());
+                    if(!CheckUtils.isObjectEmpty(user.getQq())){
+                        try {
+                            Map<String, Object> map = new HashMap<>();  // 页面的动态数据
+                            map.put("username", user.getUser());
+                            map.put("password", user.getPass());
+                            map.put("keyword", user.getCkey());
+                            if(user.getAuthTime().equals(-1)){
+                                map.put("data", "永久");
+                            }else {
+                                map.put("data", MyUtils.dateToStr(MyUtils.stamp2Date(user.getAuthTime().toString())));
+                            }
+                            map.put("qq", user.getQq());
+                            map.put("point", user.getPoint());
+                            emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{user.getQq()+"@qq.com"});
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
+                        }
+                    }
                     return Result.ok("注册成功", jsonObject);
                 } else {
                     return Result.error("注册失败");
