@@ -13,8 +13,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
@@ -23,15 +27,17 @@ import java.util.Map;
  */
 @Service
 public class EmailServiceImpl implements IEmailService {
+    @Value("${spring.mail.nickname}")
+    private String nickname;
     @Value("${spring.mail.username}")
     private String formEmail;  // 发件人
     @Autowired
     private JavaMailSender mailSender;
 
     @Override
-    public void sendTextEmail(String title, String content, String[] toEmails) {
+    public void sendTextEmail(String title, String content, String[] toEmails) throws UnsupportedEncodingException, AddressException {
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(formEmail);
+        message.setFrom(new InternetAddress(MimeUtility.encodeText(nickname)+"<"+formEmail+">").toString());
         message.setTo(toEmails);
         message.setSubject(title);
         message.setText(content);
@@ -39,10 +45,10 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    public void sendFullTextEmail(String title, String html, String[] toEmails) throws MessagingException {
+    public void sendFullTextEmail(String title, String html, String[] toEmails) throws MessagingException, UnsupportedEncodingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-        helper.setFrom(formEmail);
+        helper.setFrom(new InternetAddress(MimeUtility.encodeText(nickname)+"<"+formEmail+">").toString());
         helper.setTo(toEmails);
         helper.setSubject(title);
         // 发送邮件

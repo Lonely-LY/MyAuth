@@ -91,6 +91,8 @@ spring:
     username: xxxxxx@xxx.com
     # 密码
     password: xxxxxxxx
+    # 发件昵称
+    nickname: MyAuth授权中心
     # 编码格式
     default-encoding: UTF-8
     properties:
