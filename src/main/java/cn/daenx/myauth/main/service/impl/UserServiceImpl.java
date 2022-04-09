@@ -62,22 +62,78 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private RoleMapper roleMapper;
     @Value("${genKey}")
     private String genKey;
+
     @Value("${requestSendMail}")
     private boolean requestSendMail;
+    @Value("${requestMailTheme}")
+    private String requestMailTheme;
+    @Value("${requestMailTitle}")
+    private String requestMailTitle;
+    @Value("${requestMailTemplates}")
+    private String requestMailTemplates;
+
     @Value("${useCkeySendMail}")
     private boolean useCkeySendMail;
+    @Value("${useCkeyMailTheme}")
+    private String useCkeyMailTheme;
+    @Value("${useCkeyMailTitle}")
+    private String useCkeyMailTitle;
+    @Value("${useCkeyMailTemplates}")
+    private String useCkeyMailTemplates;
+
     @Value("${editPassSendMail}")
     private boolean editPassSendMail;
+    @Value("${editPassMailTheme}")
+    private String editPassMailTheme;
+    @Value("${editPassMailTitle}")
+    private String editPassMailTitle;
+    @Value("${editPassMailTemplates}")
+    private String editPassMailTemplates;
+
     @Value("${editInfoSendMail}")
     private boolean editInfoSendMail;
+    @Value("${editInfoMailTheme}")
+    private String editInfoMailTheme;
+    @Value("${editInfoMailTitle}")
+    private String editInfoMailTitle;
+    @Value("${editInfoMailTemplates}")
+    private String editInfoMailTemplates;
+
     @Value("${updUserSendMail}")
     private boolean updUserSendMail;
+    @Value("${updUserMailTheme}")
+    private String updUserMailTheme;
+    @Value("${updUserMailTitle}")
+    private String updUserMailTitle;
+    @Value("${updUserMailTemplates}")
+    private String updUserMailTemplates;
+
     @Value("${authTimeExpiresSendMail}")
     private boolean authTimeExpiresSendMail;
+    @Value("${authTimeExpiresMailTheme}")
+    private String authTimeExpiresMailTheme;
+    @Value("${authTimeExpiresMailTitle}")
+    private String authTimeExpiresMailTitle;
+    @Value("${authTimeExpiresMailTemplates}")
+    private String authTimeExpiresMailTemplates;
+
     @Value("${unbindSendMail}")
     private boolean unbindSendMail;
+    @Value("${unbindMailTheme}")
+    private String unbindMailTheme;
+    @Value("${unbindMailTitle}")
+    private String unbindMailTitle;
+    @Value("${unbindMailTemplates}")
+    private String unbindMailTemplates;
+
     @Value("${addUserSendMail}")
     private boolean addUserSendMail;
+    @Value("${addUserMailTheme}")
+    private String addUserMailTheme;
+    @Value("${addUserMailTitle}")
+    private String addUserMailTitle;
+    @Value("${addUserMailTemplates}")
+    private String addUserMailTemplates;
 
 
     /**
@@ -123,18 +179,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     if(!CheckUtils.isObjectEmpty(user.getQq())){
                         try {
                             Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                            map.put("mailTitle","您的授权绑定已注册成功！");
+                            map.put("mailTitle",requestMailTitle);
                             map.put("name",user.getName());
                             map.put("username", user.getUser());
                             map.put("password", user.getPass());
                             map.put("keyword", user.getCkey());
                             map.put("DeviceCode",user.getDeviceCode());
+                            map.put("LastIp",user.getLastIp());
+                            map.put("RegTime",CheckUtils.isObjectEmpty(user.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(user.getRegTime().toString())));
+                            map.put("LastTime",CheckUtils.isObjectEmpty(user.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(user.getLastTime().toString())));
                             Soft obj = (Soft) redisUtil.get("id:soft:"+ user.getFromSoftId());
                             map.put("SoftName",obj.getName());
                             map.put("data", "免费模式");
                             map.put("qq", user.getQq());
                             map.put("point", user.getPoint());
-                            emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{user.getQq()+"@qq.com"});
+                            emailService.sendHtmlEmail( requestMailTheme, "email/" + requestMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
                         } catch (Exception e) {
                             e.printStackTrace();
                             return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
@@ -177,12 +236,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         if(!CheckUtils.isObjectEmpty(user.getQq())){
                             try {
                                 Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                                map.put("mailTitle","您的授权绑定已注册成功！");
+                                map.put("mailTitle",requestMailTitle);
                                 map.put("name",user.getName());
                                 map.put("username", user.getUser());
                                 map.put("password", user.getPass());
                                 map.put("keyword", user.getCkey());
                                 map.put("DeviceCode",user.getDeviceCode());
+                                map.put("LastIp",user.getLastIp());
+                                map.put("RegTime",CheckUtils.isObjectEmpty(user.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(user.getRegTime().toString())));
+                                map.put("LastTime",CheckUtils.isObjectEmpty(user.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(user.getLastTime().toString())));
                                 Soft obj = (Soft) redisUtil.get("id:soft:"+ user.getFromSoftId());
                                 map.put("SoftName",obj.getName());
                                 if(user.getAuthTime().equals(-1)){
@@ -192,7 +254,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", user.getQq());
                                 map.put("point", user.getPoint());
-                                emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{user.getQq()+"@qq.com"});
+                                emailService.sendHtmlEmail(requestMailTheme, "email/" + requestMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
+
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
@@ -257,12 +320,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         if(!CheckUtils.isObjectEmpty(user.getQq())){
                             try {
                                 Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                                map.put("mailTitle","您的授权绑定已注册成功！");
+                                map.put("mailTitle",requestMailTitle);
                                 map.put("name",user.getName());
                                 map.put("username", user.getUser());
                                 map.put("password", user.getPass());
                                 map.put("keyword", user.getCkey());
                                 map.put("DeviceCode",user.getDeviceCode());
+                                map.put("LastIp",user.getLastIp());
+                                map.put("RegTime",CheckUtils.isObjectEmpty(user.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(user.getRegTime().toString())));
+                                map.put("LastTime",CheckUtils.isObjectEmpty(user.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(user.getLastTime().toString())));
                                 Soft obj = (Soft) redisUtil.get("id:soft:"+ user.getFromSoftId());
                                 map.put("SoftName",obj.getName());
                                 if(user.getAuthTime().equals(-1)){
@@ -272,7 +338,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", user.getQq());
                                 map.put("point", user.getPoint());
-                                emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{user.getQq()+"@qq.com"});
+                                emailService.sendHtmlEmail(requestMailTheme, "email/" + requestMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
@@ -526,12 +592,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         if(!CheckUtils.isObjectEmpty(userA.getQq())){
                             try {
                                 Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                                map.put("mailTitle","您的授权绑定已到期！");
+                                map.put("mailTitle",authTimeExpiresMailTitle);
                                 map.put("name",userA.getName());
                                 map.put("username", userA.getUser());
                                 map.put("password", userA.getPass());
                                 map.put("keyword", userA.getCkey());
                                 map.put("DeviceCode",userA.getDeviceCode());
+                                map.put("LastIp",userA.getLastIp());
+                                map.put("RegTime",CheckUtils.isObjectEmpty(userA.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getRegTime().toString())));
+                                map.put("LastTime",CheckUtils.isObjectEmpty(userA.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getLastTime().toString())));
                                 Soft obj = (Soft) redisUtil.get("id:soft:"+ userA.getFromSoftId());
                                 map.put("SoftName",obj.getName());
                                 if(userA.getAuthTime().equals(-1)){
@@ -541,7 +610,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", userA.getQq());
                                 map.put("point", userA.getPoint());
-                                emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{userA.getQq()+"@qq.com"});
+                                emailService.sendHtmlEmail(authTimeExpiresMailTheme, "email/" + authTimeExpiresMailTemplates + ".html", map, new String[]{userA.getQq()+"@qq.com"});
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 return Result.error("授权已到期、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -687,12 +756,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 if(!CheckUtils.isObjectEmpty(userA.getQq())){
                     try {
                         Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                        map.put("mailTitle","您的授权绑定已使用新的卡密！");
+                        map.put("mailTitle",useCkeyMailTitle);
                         map.put("name",userA.getName());
                         map.put("username", userA.getUser());
                         map.put("password", userA.getPass());
                         map.put("keyword", userA.getCkey());
                         map.put("DeviceCode",userA.getDeviceCode());
+                        map.put("LastIp",userA.getLastIp());
+                        map.put("RegTime",CheckUtils.isObjectEmpty(userA.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getRegTime().toString())));
+                        map.put("LastTime",CheckUtils.isObjectEmpty(userA.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getLastTime().toString())));
                         Soft obj = (Soft) redisUtil.get("id:soft:"+ userA.getFromSoftId());
                         map.put("SoftName",obj.getName());
                         if(userA.getAuthTime().equals(-1)){
@@ -702,7 +774,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         }
                         map.put("qq", userA.getQq());
                         map.put("point", userA.getPoint());
-                        emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{userA.getQq()+"@qq.com"});
+                        emailService.sendHtmlEmail(useCkeyMailTheme, "email/" + useCkeyMailTemplates + ".html", map, new String[]{userA.getQq()+"@qq.com"});
                     } catch (Exception e) {
                         e.printStackTrace();
                         return Result.ok("使用卡密成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -811,12 +883,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if(!CheckUtils.isObjectEmpty(userA.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle","您的授权绑定已解绑！");
+                    map.put("mailTitle",unbindMailTitle);
                     map.put("name",userA.getName());
                     map.put("username", userA.getUser());
                     map.put("password", userA.getPass());
                     map.put("keyword", userA.getCkey());
                     map.put("DeviceCode",userA.getDeviceCode());
+                    map.put("LastIp",userA.getLastIp());
+                    map.put("RegTime",CheckUtils.isObjectEmpty(userA.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getRegTime().toString())));
+                    map.put("LastTime",CheckUtils.isObjectEmpty(userA.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getLastTime().toString())));
                     Soft obj = (Soft) redisUtil.get("id:soft:"+ userA.getFromSoftId());
                     map.put("SoftName",obj.getName());
                     if(userA.getAuthTime().equals(-1)){
@@ -826,7 +901,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userA.getQq());
                     map.put("point", userA.getPoint());
-                    emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{userA.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(unbindMailTheme, "email/" + unbindMailTemplates + ".html", map, new String[]{userA.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("解绑成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -891,12 +966,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if(!CheckUtils.isObjectEmpty(userA.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle","您的授权绑定已修改密码！");
+                    map.put("mailTitle",editPassMailTitle);
                     map.put("name",userA.getName());
                     map.put("username", userA.getUser());
                     map.put("password", userA.getPass());
                     map.put("keyword", userA.getCkey());
                     map.put("DeviceCode",userA.getDeviceCode());
+                    map.put("LastIp",userA.getLastIp());
+                    map.put("RegTime",CheckUtils.isObjectEmpty(userA.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getRegTime().toString())));
+                    map.put("LastTime",CheckUtils.isObjectEmpty(userA.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getLastTime().toString())));
                     Soft obj = (Soft) redisUtil.get("id:soft:"+ userA.getFromSoftId());
                     map.put("SoftName",obj.getName());
                     if(userA.getAuthTime().equals(-1)){
@@ -906,7 +984,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userA.getQq());
                     map.put("point", userA.getPoint());
-                    emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{userA.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(editPassMailTheme, "email/" + editPassMailTemplates + ".html", map, new String[]{userA.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改密码成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -946,13 +1024,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if(!CheckUtils.isObjectEmpty(userR.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle","您的授权绑定已修改QQ或昵称！");
+                    map.put("mailTitle",editInfoMailTitle);
                     map.put("name",userR.getName());
                     map.put("username", userR.getUser());
                     map.put("password", userR.getPass());
                     map.put("keyword", userR.getCkey());
                     map.put("DeviceCode",userR.getDeviceCode());
-                    Soft obj = (Soft) redisUtil.get("id:soft:"+ user.getFromSoftId());
+                    map.put("LastIp",userR.getLastIp());
+                    map.put("RegTime",CheckUtils.isObjectEmpty(userR.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userR.getRegTime().toString())));
+                    map.put("LastTime",CheckUtils.isObjectEmpty(userR.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userR.getLastTime().toString())));
+                    Soft obj = (Soft) redisUtil.get("id:soft:"+ userR.getFromSoftId());
                     map.put("SoftName",obj.getName());
                     if(userR.getAuthTime().equals(-1)){
                         map.put("data", "永久");
@@ -961,7 +1042,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userR.getQq());
                     map.put("point", userR.getPoint());
-                    emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{userR.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(editInfoMailTheme, "email/" + editInfoMailTemplates + ".html", map, new String[]{userR.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改资料成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1062,12 +1143,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if(!CheckUtils.isObjectEmpty(user.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle","您的授权绑定已修改！");
+                    map.put("mailTitle",updUserMailTitle);
                     map.put("name",user.getName());
                     map.put("username", user.getUser());
                     map.put("password", user.getPass());
                     map.put("keyword", user.getCkey());
-                    map.put("DeviceCode",user.getDeviceCode());
+                    map.put("DeviceCode",oldUser.getDeviceCode());
+                    map.put("LastIp",oldUser.getLastIp());
+                    map.put("RegTime",CheckUtils.isObjectEmpty(oldUser.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(oldUser.getRegTime().toString())));
+                    map.put("LastTime",CheckUtils.isObjectEmpty(oldUser.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(oldUser.getLastTime().toString())));
                     Soft obj = (Soft) redisUtil.get("id:soft:"+ oldUser.getFromSoftId());
                     map.put("SoftName",obj.getName());
                     if(user.getAuthTime().equals(-1)){
@@ -1077,7 +1161,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", user.getQq());
                     map.put("point", user.getPoint());
-                    emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{user.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(updUserMailTheme, "email/" + updUserMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1118,12 +1202,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if(!CheckUtils.isObjectEmpty(user.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle","您的授权绑定已新增！");
+                    map.put("mailTitle",addUserMailTitle);
                     map.put("name",user.getName());
                     map.put("username", user.getUser());
                     map.put("password", user.getPass());
                     map.put("keyword", user.getCkey());
                     map.put("DeviceCode",user.getDeviceCode());
+                    map.put("LastIp",user.getLastIp());
+                    map.put("RegTime",CheckUtils.isObjectEmpty(user.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(user.getRegTime().toString())));
+                    map.put("LastTime",CheckUtils.isObjectEmpty(user.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(user.getLastTime().toString())));
                     Soft obj = (Soft) redisUtil.get("id:soft:"+ user.getFromSoftId());
                     map.put("SoftName",obj.getName());
                     if(user.getAuthTime().equals(-1)){
@@ -1133,7 +1220,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", user.getQq());
                     map.put("point", user.getPoint());
-                    emailService.sendHtmlEmail( "授权提醒", "email/authSend.html", map, new String[]{user.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(addUserMailTheme, "email/" + addUserMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改成功、邮箱提醒用户失败、请检查邮箱系统配置。");
