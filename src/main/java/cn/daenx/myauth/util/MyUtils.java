@@ -381,4 +381,18 @@ public class MyUtils {
         int totalPageNum = (totalRecord + pageSize - 1) / pageSize;
         return totalPageNum;
     }
+
+    /**
+     * 删除末尾 /
+     *
+     * @param s
+     * @return
+     */
+    public static String removeDH(String s){
+        //若最后一个字符为/，则通过substring截取需要的值
+        if(s.charAt(s.length()-1) == '/') {
+            s = s.substring(0, s.length()-1);
+        }
+        return s;
+    }
 }

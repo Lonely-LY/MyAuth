@@ -19,7 +19,8 @@ public enum AlogEnums {
     ADMIN_MAKE(0,"管理员奖惩"),
     ADD_CARD(1,"生成卡密"),
     ADD_AUTH(2,"添加授权"),
-    MAKE_CARD(3,"使用卡密");
+    MAKE_CARD(3,"使用卡密"),
+    ADMIN_RECHARGE(4,"后台充值");
     private Integer code;
     private String desc;
     private static final Map<Integer, String> codeMap;

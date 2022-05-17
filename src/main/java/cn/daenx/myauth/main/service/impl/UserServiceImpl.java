@@ -59,81 +59,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Resource
     private IEmailService emailService;
     @Resource
+    private MailSendMapper mailSendMapper;
+    @Resource
     private RoleMapper roleMapper;
     @Value("${genKey}")
     private String genKey;
-
-    @Value("${requestSendMail}")
-    private boolean requestSendMail;
-    @Value("${requestMailTheme}")
-    private String requestMailTheme;
-    @Value("${requestMailTitle}")
-    private String requestMailTitle;
-    @Value("${requestMailTemplates}")
-    private String requestMailTemplates;
-
-    @Value("${useCkeySendMail}")
-    private boolean useCkeySendMail;
-    @Value("${useCkeyMailTheme}")
-    private String useCkeyMailTheme;
-    @Value("${useCkeyMailTitle}")
-    private String useCkeyMailTitle;
-    @Value("${useCkeyMailTemplates}")
-    private String useCkeyMailTemplates;
-
-    @Value("${editPassSendMail}")
-    private boolean editPassSendMail;
-    @Value("${editPassMailTheme}")
-    private String editPassMailTheme;
-    @Value("${editPassMailTitle}")
-    private String editPassMailTitle;
-    @Value("${editPassMailTemplates}")
-    private String editPassMailTemplates;
-
-    @Value("${editInfoSendMail}")
-    private boolean editInfoSendMail;
-    @Value("${editInfoMailTheme}")
-    private String editInfoMailTheme;
-    @Value("${editInfoMailTitle}")
-    private String editInfoMailTitle;
-    @Value("${editInfoMailTemplates}")
-    private String editInfoMailTemplates;
-
-    @Value("${updUserSendMail}")
-    private boolean updUserSendMail;
-    @Value("${updUserMailTheme}")
-    private String updUserMailTheme;
-    @Value("${updUserMailTitle}")
-    private String updUserMailTitle;
-    @Value("${updUserMailTemplates}")
-    private String updUserMailTemplates;
-
-    @Value("${authTimeExpiresSendMail}")
-    private boolean authTimeExpiresSendMail;
-    @Value("${authTimeExpiresMailTheme}")
-    private String authTimeExpiresMailTheme;
-    @Value("${authTimeExpiresMailTitle}")
-    private String authTimeExpiresMailTitle;
-    @Value("${authTimeExpiresMailTemplates}")
-    private String authTimeExpiresMailTemplates;
-
-    @Value("${unbindSendMail}")
-    private boolean unbindSendMail;
-    @Value("${unbindMailTheme}")
-    private String unbindMailTheme;
-    @Value("${unbindMailTitle}")
-    private String unbindMailTitle;
-    @Value("${unbindMailTemplates}")
-    private String unbindMailTemplates;
-
-    @Value("${addUserSendMail}")
-    private boolean addUserSendMail;
-    @Value("${addUserMailTheme}")
-    private String addUserMailTheme;
-    @Value("${addUserMailTitle}")
-    private String addUserMailTitle;
-    @Value("${addUserMailTemplates}")
-    private String addUserMailTemplates;
 
 
     /**
@@ -149,6 +79,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userLambdaQueryWrapper.eq(User::getUser, userC.getUser());
         userLambdaQueryWrapper.eq(User::getFromSoftId, softC.getId());
         User userA = userMapper.selectOne(userLambdaQueryWrapper);
+
+        LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "request");
+        MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
         if (!CheckUtils.isObjectEmpty(userA)) {
             return Result.error("账号已存在");
         }
@@ -175,11 +110,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 jsonObject.put("user", user.getUser());
                 jsonObject.put("authTime", -1);
                 jsonObject.put("point", 0);
-                if(requestSendMail){
+                if(mailSend.getSendSwitch().equals(1)){
                     if(!CheckUtils.isObjectEmpty(user.getQq())){
                         try {
                             Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                            map.put("mailTitle",requestMailTitle);
+                            map.put("mailTitle",mailSend.getSendTitle());
                             map.put("name",user.getName());
                             map.put("username", user.getUser());
                             map.put("password", user.getPass());
@@ -193,7 +128,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                             map.put("data", "免费模式");
                             map.put("qq", user.getQq());
                             map.put("point", user.getPoint());
-                            emailService.sendHtmlEmail( requestMailTheme, "email/" + requestMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                            emailService.sendHtmlEmail( mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
                         } catch (Exception e) {
                             e.printStackTrace();
                             return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
@@ -232,11 +167,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     jsonObject.put("user", user.getUser());
                     jsonObject.put("authTime", user.getAuthTime());
                     jsonObject.put("point", 0);
-                    if(requestSendMail){
+                    if(mailSend.getSendSwitch().equals(1)){
                         if(!CheckUtils.isObjectEmpty(user.getQq())){
                             try {
                                 Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                                map.put("mailTitle",requestMailTitle);
+                                map.put("mailTitle",mailSend.getSendTitle());
                                 map.put("name",user.getName());
                                 map.put("username", user.getUser());
                                 map.put("password", user.getPass());
@@ -254,7 +189,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", user.getQq());
                                 map.put("point", user.getPoint());
-                                emailService.sendHtmlEmail(requestMailTheme, "email/" + requestMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                                emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -316,11 +251,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     jsonObject.put("user", user.getUser());
                     jsonObject.put("authTime", user.getAuthTime());
                     jsonObject.put("point", user.getPoint());
-                    if(requestSendMail){
+                    if(mailSend.getSendSwitch().equals(1)){
                         if(!CheckUtils.isObjectEmpty(user.getQq())){
                             try {
                                 Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                                map.put("mailTitle",requestMailTitle);
+                                map.put("mailTitle",mailSend.getSendTitle());
                                 map.put("name",user.getName());
                                 map.put("username", user.getUser());
                                 map.put("password", user.getPass());
@@ -338,7 +273,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", user.getQq());
                                 map.put("point", user.getPoint());
-                                emailService.sendHtmlEmail(requestMailTheme, "email/" + requestMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                                emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
@@ -587,12 +522,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             } else {
                 //不是永久授权
                 if (userA.getAuthTime() < Integer.parseInt(MyUtils.getTimeStamp())) {
+                    LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                    mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "authTimeExpires");
+                    MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
                     //已经到期
-                    if(authTimeExpiresSendMail){
+                    if(mailSend.getSendSwitch().equals(1)){
                         if(!CheckUtils.isObjectEmpty(userA.getQq())){
                             try {
                                 Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                                map.put("mailTitle",authTimeExpiresMailTitle);
+                                map.put("mailTitle",mailSend.getSendTitle());
                                 map.put("name",userA.getName());
                                 map.put("username", userA.getUser());
                                 map.put("password", userA.getPass());
@@ -610,7 +548,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", userA.getQq());
                                 map.put("point", userA.getPoint());
-                                emailService.sendHtmlEmail(authTimeExpiresMailTheme, "email/" + authTimeExpiresMailTemplates + ".html", map, new String[]{userA.getQq()+"@qq.com"});
+                                emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userA.getQq()+"@qq.com"});
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 return Result.error("授权已到期、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -651,6 +589,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userLambdaQueryWrapper.eq(User::getUser, userC.getUser());
         userLambdaQueryWrapper.eq(User::getFromSoftId, softC.getId());
         User userA = userMapper.selectOne(userLambdaQueryWrapper);
+
+        LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "useCkey");
+        MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
         if (CheckUtils.isObjectEmpty(userA)) {
             return Result.error("账号不存在");
         }
@@ -752,11 +695,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             jsonObject.put("regTime", userA.getRegTime());
             jsonObject.put("remark", userA.getRemark());
             jsonObject.put("authTime", userA.getAuthTime());
-            if(useCkeySendMail){
+            if(mailSend.getSendSwitch().equals(1)){
                 if(!CheckUtils.isObjectEmpty(userA.getQq())){
                     try {
                         Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                        map.put("mailTitle",useCkeyMailTitle);
+                        map.put("mailTitle",mailSend.getSendTitle());
                         map.put("name",userA.getName());
                         map.put("username", userA.getUser());
                         map.put("password", userA.getPass());
@@ -774,7 +717,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         }
                         map.put("qq", userA.getQq());
                         map.put("point", userA.getPoint());
-                        emailService.sendHtmlEmail(useCkeyMailTheme, "email/" + useCkeyMailTemplates + ".html", map, new String[]{userA.getQq()+"@qq.com"});
+                        emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userA.getQq()+"@qq.com"});
                     } catch (Exception e) {
                         e.printStackTrace();
                         return Result.ok("使用卡密成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -876,14 +819,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (num == 0) {
             return Result.error("解绑失败");
         }
+
+        LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "unbind");
+        MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userA.getUser());
         redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
-        if(unbindSendMail){
+        if(mailSend.getSendSwitch().equals(1)){
             if(!CheckUtils.isObjectEmpty(userA.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle",unbindMailTitle);
+                    map.put("mailTitle",mailSend.getSendTitle());
                     map.put("name",userA.getName());
                     map.put("username", userA.getUser());
                     map.put("password", userA.getPass());
@@ -901,7 +849,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userA.getQq());
                     map.put("point", userA.getPoint());
-                    emailService.sendHtmlEmail(unbindMailTheme, "email/" + unbindMailTemplates + ".html", map, new String[]{userA.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userA.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("解绑成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -926,6 +874,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userLambdaQueryWrapper.eq(User::getUser, userS);
         userLambdaQueryWrapper.eq(User::getFromSoftId, softC.getId());
         User userA = userMapper.selectOne(userLambdaQueryWrapper);
+
+        LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "editPass");
+        MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
         if (CheckUtils.isObjectEmpty(userA)) {
             return Result.error("账号不存在");
         }
@@ -962,11 +915,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userA.getUser());
         redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
-        if(editPassSendMail){
+        if(mailSend.getSendSwitch().equals(1)){
             if(!CheckUtils.isObjectEmpty(userA.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle",editPassMailTitle);
+                    map.put("mailTitle",mailSend.getSendTitle());
                     map.put("name",userA.getName());
                     map.put("username", userA.getUser());
                     map.put("password", userA.getPass());
@@ -984,7 +937,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userA.getQq());
                     map.put("point", userA.getPoint());
-                    emailService.sendHtmlEmail(editPassMailTheme, "email/" + editPassMailTemplates + ".html", map, new String[]{userA.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userA.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改密码成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1010,6 +963,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (num == 0) {
             return Result.error("修改资料失败");
         }
+
+        LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "editInfo");
+        MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
         redisUtil.set("user:" + soft.getId() + ":" + user.getUser(), userR, soft.getHeartTime());
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userR.getUser());
@@ -1020,11 +978,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         jsonObject.put("regTime", userR.getRegTime());
         jsonObject.put("remark", userR.getRemark());
         jsonObject.put("authTime", userR.getAuthTime());
-        if(editInfoSendMail){
+        if(mailSend.getSendSwitch().equals(1)){
             if(!CheckUtils.isObjectEmpty(userR.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle",editInfoMailTitle);
+                    map.put("mailTitle",mailSend.getSendTitle());
                     map.put("name",userR.getName());
                     map.put("username", userR.getUser());
                     map.put("password", userR.getPass());
@@ -1042,7 +1000,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userR.getQq());
                     map.put("point", userR.getPoint());
-                    emailService.sendHtmlEmail(editInfoMailTheme, "email/" + editInfoMailTemplates + ".html", map, new String[]{userR.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userR.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改资料成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1138,12 +1096,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (num <= 0) {
             return Result.error("修改失败");
         }
+
+        LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "updUser");
+        MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
         redisUtil.del("user:" + oldUser.getFromSoftId() + ":" + oldUser.getUser());
-        if(updUserSendMail){
+        if(mailSend.getSendSwitch().equals(1)){
             if(!CheckUtils.isObjectEmpty(user.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle",updUserMailTitle);
+                    map.put("mailTitle",mailSend.getSendTitle());
                     map.put("name",user.getName());
                     map.put("username", user.getUser());
                     map.put("password", user.getPass());
@@ -1161,7 +1124,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", user.getQq());
                     map.put("point", user.getPoint());
-                    emailService.sendHtmlEmail(updUserMailTheme, "email/" + updUserMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1198,11 +1161,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (num <= 0) {
             return Result.error("添加失败");
         }
-        if(addUserSendMail){
+
+        LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "addUser");
+        MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
+        if(mailSend.getSendSwitch().equals(1)){
             if(!CheckUtils.isObjectEmpty(user.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
-                    map.put("mailTitle",addUserMailTitle);
+                    map.put("mailTitle",mailSend.getSendTitle());
                     map.put("name",user.getName());
                     map.put("username", user.getUser());
                     map.put("password", user.getPass());
@@ -1220,7 +1188,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", user.getQq());
                     map.put("point", user.getPoint());
-                    emailService.sendHtmlEmail(addUserMailTheme, "email/" + addUserMailTemplates + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改成功、邮箱提醒用户失败、请检查邮箱系统配置。");

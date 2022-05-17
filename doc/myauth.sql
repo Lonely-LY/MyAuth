@@ -1,17 +1,17 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : 本地_MySQL_8
+ Source Server         : myauthtest_3306
  Source Server Type    : MySQL
- Source Server Version : 80012
+ Source Server Version : 80029
  Source Host           : localhost:3306
- Source Schema         : abcdef
+ Source Schema         : myauthtest
 
  Target Server Type    : MySQL
- Target Server Version : 80012
+ Target Server Version : 80029
  File Encoding         : 65001
 
- Date: 17/05/2022 13:48:46
+ Date: 17/05/2022 16:05:36
 */
 
 SET NAMES utf8mb4;
@@ -160,6 +160,46 @@ CREATE TABLE `ma_data`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for ma_epay_config
+-- ----------------------------
+DROP TABLE IF EXISTS `ma_epay_config`;
+CREATE TABLE `ma_epay_config`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '易支付API地址',
+  `pid` int(11) NULL DEFAULT NULL COMMENT '商户ID',
+  `ekey` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户密匙',
+  `notify_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '异步通知地址(后端地址)',
+  `return_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付成功跳转地址',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of ma_epay_config
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for ma_epay_orders
+-- ----------------------------
+DROP TABLE IF EXISTS `ma_epay_orders`;
+CREATE TABLE `ma_epay_orders`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `trade_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '易支付订单号',
+  `out_trade_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户订单号',
+  `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付类型(alipay:支付宝,tenpay:财付通,qqpay:QQ钱包,wxpay:微信支付)',
+  `addtime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建订单时间',
+  `endtime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '完成交易时间',
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名称',
+  `money` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品金额',
+  `status` int(2) NULL DEFAULT NULL COMMENT '支付状态(1为支付成功,0为未支付)',
+  `from_admin_id` int(11) NULL DEFAULT NULL COMMENT '创建订单管理员',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of ma_epay_orders
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for ma_event
 -- ----------------------------
 DROP TABLE IF EXISTS `ma_event`;
@@ -196,6 +236,32 @@ CREATE TABLE `ma_js`  (
 -- ----------------------------
 -- Records of ma_js
 -- ----------------------------
+
+-- ----------------------------
+-- Table structure for ma_mail_send
+-- ----------------------------
+DROP TABLE IF EXISTS `ma_mail_send`;
+CREATE TABLE `ma_mail_send`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `send_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '通知类型',
+  `send_switch` int(2) NULL DEFAULT NULL COMMENT '通知开关1开打,0关闭',
+  `send_theme` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '主题',
+  `send_title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '标题',
+  `send_templates` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '模板',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 9 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of ma_mail_send
+-- ----------------------------
+INSERT INTO `ma_mail_send` VALUES (1, 'request', 0, 'MyAuth授权中心注册通知', '您的授权绑定已注册成功！', 'authSend');
+INSERT INTO `ma_mail_send` VALUES (2, 'useCkey', 0, 'MyAuth授权中心使用卡密通知', '您的授权绑定已使用新的卡密！', 'authSend');
+INSERT INTO `ma_mail_send` VALUES (3, 'unbind', 0, 'MyAuth授权中心用户解绑通知', '您的授权绑定已解绑！', 'authSend');
+INSERT INTO `ma_mail_send` VALUES (4, 'editPass', 0, 'MyAuth授权中心修改密码通知', '您的授权绑定已修改密码！', 'authSend');
+INSERT INTO `ma_mail_send` VALUES (5, 'editInfo', 0, 'MyAuth授权中心资料(QQ/昵称)修改通知', '您的授权绑定已修改资料(QQ/昵称)！', 'authSend');
+INSERT INTO `ma_mail_send` VALUES (6, 'authTimeExpires', 0, 'MyAuth授权中心授权到期通知', '您的授权绑定已到期！', 'authSend');
+INSERT INTO `ma_mail_send` VALUES (7, 'updUser', 0, 'MyAuth授权中心授权修改通知', '管理员已修改你的授权信息！', 'authSend');
+INSERT INTO `ma_mail_send` VALUES (8, 'addUser', 0, 'MyAuth授权中心授权添加通知', '管理员已添加你的授权信息！', 'authSend');
 
 -- ----------------------------
 -- Table structure for ma_menu
@@ -244,6 +310,9 @@ INSERT INTO `ma_menu` VALUES ('d499258d-ea25-47e1-b580-ed98830df37f', 'd6321208-
 INSERT INTO `ma_menu` VALUES ('e4fa47b7-aa79-4708-9ce1-c7b686db6a50', NULL, 1, 2, 2, '/DataStatistics/List', '数据看板', 'radar-chart');
 INSERT INTO `ma_menu` VALUES ('ddff63b5-38db-4889-882d-fd9d9c4e583f', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 8, 2, '/SystemManage/StorageType/List', '额外存储类型', NULL);
 INSERT INTO `ma_menu` VALUES ('9b69d1b6-f0a6-48f9-9f25-cc121fda88aa', 'd6321208-4980-46e3-b3d4-ec057009472c', 2, 8, 2, '/DataMaintenance/Storage/List', '额外存储', NULL);
+INSERT INTO `ma_menu` VALUES ('1599a39b-38ce-4fca-9819-5fead2e63546', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 9, 2, '/SystemManage/EpayManage/index', '易支付配置', NULL);
+INSERT INTO `ma_menu` VALUES ('8dcc2036-3b90-4033-abdb-2d7a5636998e', 'd6321208-4980-46e3-b3d4-ec057009472c', 2, 9, 2, '/DataMaintenance/EpayOrdersManage/List', '订单管理', NULL);
+INSERT INTO `ma_menu` VALUES ('7ddb181b-3c6a-4a63-b45c-172ee8d7917b', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 10, 2, '/SystemManage/MailSendManage/index', '邮件通知管理', NULL);
 
 -- ----------------------------
 -- Table structure for ma_msg
@@ -315,12 +384,12 @@ CREATE TABLE `ma_role`  (
   `meun_ids` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '只存menu的id，json数组',
   `discount` int(11) NOT NULL DEFAULT 100 COMMENT '折扣，单位百分%',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ma_role
 -- ----------------------------
-INSERT INTO `ma_role` VALUES (1, '超级管理员', 0, '[\"59664367-11eb-489e-867d-af6c66129d03\",\"e4fa47b7-aa79-4708-9ce1-c7b686db6a50\",\"e50cadbc-8b2b-4c8f-a262-9da95d3371bb\",\"94beb8ae-a606-4dea-bfa8-57bc734818bf\",\"bcb68a35-eb0f-4696-acd8-3c76897e0f0f\",\"922666ba-1ed1-4b6b-9043-30aeead1eebe\",\"23a8778f-9424-449a-a68e-54b12e4c30f3\",\"cd256048-3f8e-4fb7-ada3-55d538ce7611\",\"b89eb2d8-40e4-4698-ab5a-ddaed7846ee1\",\"e70b3176-a2fa-4fc5-90f3-5abd9e2d13b8\",\"1d3838df-bc61-42e1-a149-dcc2705e2894\",\"5b35fe6a-da5f-46d5-b1ed-076308a38a13\",\"a59b674e-8d45-46c2-be6e-ff44d2ee7b86\",\"dbe9effe-0dc8-4378-a64c-5bf904ac6fae\",\"d499258d-ea25-47e1-b580-ed98830df37f\",\"9b69d1b6-f0a6-48f9-9f25-cc121fda88aa\",\"d7720078-3b65-4f83-b404-c117e5c46b68\",\"9d953050-f354-4e9f-9f15-b91ea6a666f0\",\"71eedb8d-ae9e-4958-a351-c8dfb4711f21\",\"546ea73a-1d46-41f5-bfa6-e646b3e741ae\",\"d58b4547-e20f-4eb9-b7d5-b3195ed5cc18\",\"014bf6d7-cff3-4b61-aa3b-f59cc0dd3235\",\"d27462d2-b316-4983-9066-f283fcf17e46\",\"ddff63b5-38db-4889-882d-fd9d9c4e583f\",\"30633357-dd12-415e-8631-660e2aa6b9ad\",\"da3af6df-cd00-4746-b788-bd2dfeab716f\",\"d6321208-4980-46e3-b3d4-ec057009472c\",\"43767678-01c5-4b54-bfac-e108b6ceb32a\"]', 100);
+INSERT INTO `ma_role` VALUES (1, '超级管理员', 0, '[\"59664367-11eb-489e-867d-af6c66129d03\",\"e4fa47b7-aa79-4708-9ce1-c7b686db6a50\",\"e50cadbc-8b2b-4c8f-a262-9da95d3371bb\",\"94beb8ae-a606-4dea-bfa8-57bc734818bf\",\"bcb68a35-eb0f-4696-acd8-3c76897e0f0f\",\"b89eb2d8-40e4-4698-ab5a-ddaed7846ee1\",\"e70b3176-a2fa-4fc5-90f3-5abd9e2d13b8\",\"1d3838df-bc61-42e1-a149-dcc2705e2894\",\"5b35fe6a-da5f-46d5-b1ed-076308a38a13\",\"a59b674e-8d45-46c2-be6e-ff44d2ee7b86\",\"dbe9effe-0dc8-4378-a64c-5bf904ac6fae\",\"d499258d-ea25-47e1-b580-ed98830df37f\",\"9b69d1b6-f0a6-48f9-9f25-cc121fda88aa\",\"8dcc2036-3b90-4033-abdb-2d7a5636998e\",\"d7720078-3b65-4f83-b404-c117e5c46b68\",\"9d953050-f354-4e9f-9f15-b91ea6a666f0\",\"71eedb8d-ae9e-4958-a351-c8dfb4711f21\",\"546ea73a-1d46-41f5-bfa6-e646b3e741ae\",\"d58b4547-e20f-4eb9-b7d5-b3195ed5cc18\",\"014bf6d7-cff3-4b61-aa3b-f59cc0dd3235\",\"d27462d2-b316-4983-9066-f283fcf17e46\",\"ddff63b5-38db-4889-882d-fd9d9c4e583f\",\"1599a39b-38ce-4fca-9819-5fead2e63546\",\"7ddb181b-3c6a-4a63-b45c-172ee8d7917b\",\"922666ba-1ed1-4b6b-9043-30aeead1eebe\",\"23a8778f-9424-449a-a68e-54b12e4c30f3\",\"cd256048-3f8e-4fb7-ada3-55d538ce7611\",\"30633357-dd12-415e-8631-660e2aa6b9ad\",\"d6321208-4980-46e3-b3d4-ec057009472c\",\"43767678-01c5-4b54-bfac-e108b6ceb32a\",\"da3af6df-cd00-4746-b788-bd2dfeab716f\"]', 100);
 INSERT INTO `ma_role` VALUES (2, '授权商', 1, '[\"59664367-11eb-489e-867d-af6c66129d03\",\"922666ba-1ed1-4b6b-9043-30aeead1eebe\",\"23a8778f-9424-449a-a68e-54b12e4c30f3\",\"cd256048-3f8e-4fb7-ada3-55d538ce7611\",\"da3af6df-cd00-4746-b788-bd2dfeab716f\"]', 80);
 INSERT INTO `ma_role` VALUES (3, '代理商', 1, '[\"59664367-11eb-489e-867d-af6c66129d03\",\"922666ba-1ed1-4b6b-9043-30aeead1eebe\",\"23a8778f-9424-449a-a68e-54b12e4c30f3\",\"cd256048-3f8e-4fb7-ada3-55d538ce7611\",\"da3af6df-cd00-4746-b788-bd2dfeab716f\"]', 70);
 

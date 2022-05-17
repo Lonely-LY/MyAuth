@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -31,7 +32,7 @@ public class EmailServiceImpl implements IEmailService {
     private String nickname;
     @Value("${spring.mail.username}")
     private String formEmail;  // 发件人
-    @Autowired
+    @Resource
     private JavaMailSender mailSender;
 
     @Override
