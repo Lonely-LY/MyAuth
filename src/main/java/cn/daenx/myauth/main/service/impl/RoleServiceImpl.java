@@ -129,7 +129,15 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
         menuLambdaQueryWrapper.in(Menu::getId,list);
         menuLambdaQueryWrapper.eq(Menu::getType,2);
 
-        newRole.setMeunList(list);
+        List<Menu> allMenuList = menuMapper.selectList(menuLambdaQueryWrapper);
+        List<String> menuList = new ArrayList<>();
+        for(Menu s  : allMenuList){
+            if(!isNeedAdd(list,s.getId())){
+                menuList.add(s.getId());
+            }
+        }
+        newRole.setMeunList(menuList);
+
         if (!CheckUtils.isObjectEmpty(newRole.getFromSoftId()) && !newRole.getFromSoftId().equals(0)) {
             Soft obj = (Soft) redisUtil.get("id:soft:" + newRole.getFromSoftId());
             newRole.setFromSoftName(obj.getName());
