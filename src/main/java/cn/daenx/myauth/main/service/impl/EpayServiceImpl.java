@@ -115,13 +115,17 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
         map.put("return_url",eapyList.get(0).getReturnUrl());//页面跳转通知地址
         map.put("name",admin.getUser() + "余额充值");//商品名称
         map.put("money",String.valueOf(money));//金额
-        map.put("sitename",config.getSeoTitle());//网站名称
+        //兼容彩虹易支付,取消网站名称的提交
+        //map.put("sitename",config.getSeoTitle());//网站名称
         String key = eapyList.get(0).getEkey();//易支付秘钥
         map = (HashMap<String, String>) EpayUtil.sortByKey(map);
         String signStr = "";
         //遍历map 转成字符串
         for(Map.Entry<String,String> m :map.entrySet()){
-            signStr += m.getKey() + "=" +m.getValue()+"&";
+            //不拼接值为空的字段
+            if(!CheckUtils.isObjectEmpty(m.getValue())){
+                signStr += m.getKey() + "=" +m.getValue()+"&";
+            }
         }
         //去掉最后一个 &
         signStr = signStr.substring(0,signStr.length()-1);
@@ -193,7 +197,10 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
             String signStr = "";
             //遍历map 转成字符串
             for(Map.Entry<String,String> m :map.entrySet()){
-                signStr += m.getKey() + "=" +m.getValue()+"&";
+                //不拼接值为空的字段
+                if(!CheckUtils.isObjectEmpty(m.getValue())){
+                    signStr += m.getKey() + "=" +m.getValue()+"&";
+                }
             }
             //去掉最后一个 &
             signStr = signStr.substring(0,signStr.length()-1);
