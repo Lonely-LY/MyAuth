@@ -10,12 +10,14 @@ import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.util.MyUtils;
 import cn.hutool.core.map.MapUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -119,6 +121,48 @@ public class MailSendServiceImpl extends ServiceImpl<MailSendMapper, MailSend> i
         return Result.ok("发送成功");
     }
 
+    /**
+     * 开启发送，支持批量
+     *
+     * @param ids 多个用英文逗号隔开
+     * @return
+     */
+    @Override
+    public Result openSendMail(String ids) {
+        String[] idArray = ids.split(",");
+        if (idArray.length == 0) {
+            return Result.error("ids参数格式可能错误");
+        }
+        LambdaUpdateWrapper<MailSend> wrapper = new LambdaUpdateWrapper();
+        wrapper.set(MailSend::getSendSwitch, 1).in(MailSend::getId, Arrays.asList(idArray)).eq(MailSend::getSendSwitch, 0);
+        int okCount = mailSendMapper.update(null, wrapper);
+        return Result.ok("成功开启 " + okCount + " 项通知");
+    }
+
+    /**
+     * 关闭发送，支持批量
+     *
+     * @param ids 多个用英文逗号隔开
+     * @return
+     */
+    @Override
+    public Result turnOffSend(String ids) {
+        String[] idArray = ids.split(",");
+        if (idArray.length == 0) {
+            return Result.error("ids参数格式可能错误");
+        }
+        LambdaUpdateWrapper<MailSend> wrapper = new LambdaUpdateWrapper();
+        wrapper.set(MailSend::getSendSwitch, 0).in(MailSend::getId, Arrays.asList(idArray)).eq(MailSend::getSendSwitch, 1);
+        int okCount = mailSendMapper.update(null, wrapper);
+        return Result.ok("成功关闭 " + okCount + " 项通知");
+    }
+
+    /**
+     * 获取查询条件构造器
+     *
+     * @param mailSend
+     * @return
+     */
     public LambdaQueryWrapper<MailSend> getQwMailSend(MailSend mailSend) {
         LambdaQueryWrapper<MailSend> LambdaQueryWrapper = new LambdaQueryWrapper<>();
         LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(mailSend.getSendType()), MailSend::getSendType, mailSend.getSendType());

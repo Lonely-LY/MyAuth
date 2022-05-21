@@ -50,4 +50,20 @@ public interface IMailSendService extends IService<MailSend> {
      * @return
      */
     Result sendMailTest(String sendMail, String theme, String txt);
+
+    /**
+     * 开启发送，支持批量
+     *
+     * @param ids 多个用英文逗号隔开
+     * @return
+     */
+    Result openSendMail(String ids);
+
+    /**
+     * 关闭发送，支持批量
+     *
+     * @param ids 多个用英文逗号隔开
+     * @return
+     */
+    Result turnOffSend(String ids);
 }

@@ -116,4 +116,41 @@ public class MailSendController {
         return mailSendService.sendMailTest(sendMail, theme, txt);
     }
 
+    /**
+     * 开启通知（支持批量）
+     *
+     * @param request
+     * @return
+     */
+    @NoEncryptNoSign
+    @AdminLogin(is_admin = true)
+    @PostMapping("openSendMail")
+    public Result openSendMail(HttpServletRequest request) {
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+        String ids = jsonObject.getString("ids");
+        if (CheckUtils.isObjectEmpty(ids)) {
+            return Result.error("ids不能为空，多个用英文逗号隔开");
+        }
+        return mailSendService.openSendMail(ids);
+    }
+
+    /**
+     * 关闭通知（支持批量）
+     *
+     * @param request
+     * @return
+     */
+    @NoEncryptNoSign
+    @AdminLogin(is_admin = true)
+    @PostMapping("turnOffSend")
+    public Result turnOffSend(HttpServletRequest request) {
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+        String ids = jsonObject.getString("ids");
+        if (CheckUtils.isObjectEmpty(ids)) {
+            return Result.error("ids不能为空，多个用英文逗号隔开");
+        }
+        return mailSendService.turnOffSend(ids);
+    }
+
+
 }
