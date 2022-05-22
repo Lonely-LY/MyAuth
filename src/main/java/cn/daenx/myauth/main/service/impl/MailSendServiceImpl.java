@@ -113,7 +113,7 @@ public class MailSendServiceImpl extends ServiceImpl<MailSendMapper, MailSend> i
     @Override
     public Result sendMailTest(String sendMail, String theme, String txt) {
         try {
-            emailService.sendTextEmail(theme, txt, new String[]{sendMail});
+            emailService.sendFullTextEmail(theme, txt, new String[]{sendMail});
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error("发送失败、请检查邮箱系统配置。");

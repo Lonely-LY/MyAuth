@@ -8,12 +8,11 @@ import cn.daenx.myauth.util.MyUtils;
 import cn.daenx.myauth.util.RedisUtil;
 import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.base.vo.Result;
-import cn.daenx.myauth.main.entity.*;
 import cn.daenx.myauth.main.enums.CardEnums;
 import cn.daenx.myauth.main.enums.MsgEnums;
 import cn.daenx.myauth.main.enums.SoftEnums;
-import cn.daenx.myauth.main.mapper.*;
 import cn.daenx.myauth.main.service.IUserService;
+import cn.daenx.myauth.util.TemplateParseUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -128,7 +127,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                             map.put("data", "免费模式");
                             map.put("qq", user.getQq());
                             map.put("point", user.getPoint());
-                            emailService.sendHtmlEmail( mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                            String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                            emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{user.getQq()+"@qq.com"});
                         } catch (Exception e) {
                             e.printStackTrace();
                             return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
@@ -189,8 +189,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", user.getQq());
                                 map.put("point", user.getPoint());
-                                emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
-
+                                String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                                emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{user.getQq()+"@qq.com"});
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
@@ -273,7 +273,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", user.getQq());
                                 map.put("point", user.getPoint());
-                                emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                                String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                                emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{user.getQq()+"@qq.com"});
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 return Result.ok("注册成功、邮箱提醒用户失败、请检查邮箱系统配置。", jsonObject);
@@ -548,7 +549,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                                 }
                                 map.put("qq", userA.getQq());
                                 map.put("point", userA.getPoint());
-                                emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userA.getQq()+"@qq.com"});
+                                String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                                emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{userA.getQq()+"@qq.com"});
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 return Result.error("授权已到期、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -717,7 +719,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         }
                         map.put("qq", userA.getQq());
                         map.put("point", userA.getPoint());
-                        emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userA.getQq()+"@qq.com"});
+                        String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                        emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{userA.getQq()+"@qq.com"});
                     } catch (Exception e) {
                         e.printStackTrace();
                         return Result.ok("使用卡密成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -849,7 +852,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userA.getQq());
                     map.put("point", userA.getPoint());
-                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userA.getQq()+"@qq.com"});
+                    String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                    emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{userA.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("解绑成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -937,7 +941,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userA.getQq());
                     map.put("point", userA.getPoint());
-                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userA.getQq()+"@qq.com"});
+                    String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                    emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{userA.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改密码成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1000,7 +1005,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", userR.getQq());
                     map.put("point", userR.getPoint());
-                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{userR.getQq()+"@qq.com"});
+                    String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                    emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{userR.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改资料成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1124,7 +1130,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", user.getQq());
                     map.put("point", user.getPoint());
-                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                    String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                    emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{user.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1188,7 +1195,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                     map.put("qq", user.getQq());
                     map.put("point", user.getPoint());
-                    emailService.sendHtmlEmail(mailSend.getSendTheme(), "email/" + mailSend.getSendTemplates() + ".html", map, new String[]{user.getQq()+"@qq.com"});
+                    String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                    emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{user.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("修改成功、邮箱提醒用户失败、请检查邮箱系统配置。");
