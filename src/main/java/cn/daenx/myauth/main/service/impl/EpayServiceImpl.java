@@ -234,7 +234,7 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
                 alog.setMoney(epayOrders1.getMoney());
                 alog.setAfterMoney(nowMoney);
                 alog.setAdminId(admin.getId());
-                alog.setData("后台充值：" + "支付方式" + type + ",充值金额" + epayOrders1.getMoney());
+                alog.setData("后台充值：" + "支付方式" + epayOrders1.getType() + ",充值金额" + epayOrders1.getMoney());
                 alog.setType("后台充值");
                 alog.setAddTime(Integer.valueOf(MyUtils.getTimeStamp()));
                 epayOrdersMapper.updateById(epayOrders);
