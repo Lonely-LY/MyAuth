@@ -8,10 +8,9 @@
 
 * 我的QQ：[1330166564](https://wpa.qq.com/msgrd?v=3&uin=1330166564&site=qq&menu=yes)
 * 官方Q群：[1016357430](https://jq.qq.com/?_wv=1027&k=eaectWIr)
-### 其他分支
-- [@Lonely](https://gitee.com/Lonely_LY)
-  项目地址 https://gitee.com/Lonely_LY/myauth <br>
-  在本仓库的基础上增加了邮件通知、易支付等功能
+### 原项目分支
+- [@Daen](https://gitee.com/daenmax/myauth)
+  项目地址 https://gitee.com/daenmax/myauth
 ### 前端
 - [@TianYe](https://gitee.com/fieldtianye)
 项目地址 https://gitee.com/fieldtianye/my-auth-web
@@ -54,7 +53,8 @@ https://www.cnblogs.com/daen/p/16019664.html
 见doc/demo/目录
 
 ### API文档
-在线地址：[https://www.apifox.cn/apidoc/project-646981/](https://www.apifox.cn/apidoc/project-646981/)
+原项目地址：[https://www.apifox.cn/apidoc/project-646981/](https://www.apifox.cn/apidoc/project-646981/) <br>
+本项目地址：[https://www.apifox.cn/apidoc/shared-f5728933-86e8-4767-a255-926500e3e31a](https://www.apifox.cn/apidoc/shared-f5728933-86e8-4767-a255-926500e3e31a)
 
 ###  功能清单
 
@@ -111,7 +111,7 @@ https://www.cnblogs.com/daen/p/16019664.html
 - [x] 代理我的授权
 - [x] 代理我的卡密
 - [x] 代理我的余额
-- [x] 易支付(不建议使用)
+- [x] 易支付
 - [x] 订单管理(和易支付捆绑)
 - [x] 邮件发送配置
 
