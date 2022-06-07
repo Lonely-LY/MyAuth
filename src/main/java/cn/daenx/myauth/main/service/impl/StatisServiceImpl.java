@@ -160,7 +160,7 @@ public class StatisServiceImpl implements StatisService {
         }
         DataRanking dataRanking = new DataRanking();
         dataRanking.setFromSoftId(newSoft.getId());
-        dataRanking.setPageIndex(myPage.getPageIndex() + (myPage.getPageIndex() - 1) * 10);
+        dataRanking.setPageIndex((myPage.getPageIndex() - 1) * myPage.getPageSize());
         dataRanking.setPageSize(myPage.getPageSize());
         List<DataRanking> dataRankingList = dataMapper.getDataRanking(dataRanking);
         JSONObject retJson = new JSONObject(true);
@@ -200,7 +200,7 @@ public class StatisServiceImpl implements StatisService {
         }
         UserDeviceInfoRanking userDeviceInfoRanking = new UserDeviceInfoRanking();
         userDeviceInfoRanking.setFromSoftId(newSoft.getId());
-        userDeviceInfoRanking.setPageIndex(myPage.getPageIndex() + (myPage.getPageIndex() - 1) * 10);
+        userDeviceInfoRanking.setPageIndex((myPage.getPageIndex() - 1) * myPage.getPageSize());
         userDeviceInfoRanking.setPageSize(myPage.getPageSize());
         List<UserDeviceInfoRanking> userDeviceInfoRankingList = userMapper.getUserDeviceInfoRanking(userDeviceInfoRanking);
         JSONObject retJson = new JSONObject(true);

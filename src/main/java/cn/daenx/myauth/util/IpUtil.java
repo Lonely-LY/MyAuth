@@ -10,45 +10,32 @@ import java.net.UnknownHostException;
  * @author DaenMax
  */
 public class IpUtil {
-    private static final String UNKNOWN = "unknown";
-    private static final String LOCALHOST = "127.0.0.1";
-    private static final String SEPARATOR = ",";
 
     public static String getIpAddr(HttpServletRequest request) {
-        String ipAddress;
+        String ip = null;
         try {
-            ipAddress = request.getHeader("x-forwarded-for");
-            if (ipAddress == null || ipAddress.length() == 0 || UNKNOWN.equalsIgnoreCase(ipAddress)) {
-                ipAddress = request.getHeader("Proxy-Client-IP");
-            }
-            if (ipAddress == null || ipAddress.length() == 0 || UNKNOWN.equalsIgnoreCase(ipAddress)) {
-                ipAddress = request.getHeader("WL-Proxy-Client-IP");
-            }
-            if (ipAddress == null || ipAddress.length() == 0 || UNKNOWN.equalsIgnoreCase(ipAddress)) {
-                ipAddress = request.getRemoteAddr();
-                if (LOCALHOST.equals(ipAddress)) {
-                    InetAddress inet = null;
-                    try {
-                        inet = InetAddress.getLocalHost();
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    }
-                    ipAddress = inet.getHostAddress();
-                }
-            }
-            // 对于通过多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
-            // "***.***.***.***".length()
-            if (ipAddress != null && ipAddress.length() > 15) {
-                if (ipAddress.indexOf(SEPARATOR) > 0) {
-                    ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
-                }
-            }
+            ip = request.getHeader("x-forwarded-for");
+            if (isBlankIp(ip)) ip = request.getHeader("Proxy-Client-IP");
+            if (isBlankIp(ip)) ip = request.getHeader("WL-Proxy-Client-IP");
+            if (isBlankIp(ip)) ip = request.getHeader("HTTP_CLIENT_IP");
+            if (isBlankIp(ip)) ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+            if (isBlankIp(ip)) ip = request.getRemoteAddr();
+            // 多个ip获取第一个
+            if (!isBlankIp(ip) && ip.length() > 15) ip = ip.split(",")[0];
         } catch (Exception e) {
-            ipAddress = "";
+            e.printStackTrace();
         }
-        if (ipAddress.contains(":")) {
-            ipAddress = "127.0.0.1";
+        if ("0:0:0:0:0:0:0:1".equals(ip)) {
+            try {
+                ip = InetAddress.getLocalHost().getHostAddress();
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
         }
-        return ipAddress;
+        return ip;
+    }
+
+    private static boolean isBlankIp(String ip) {
+        return ip == null || ip.trim().isEmpty() || "unknown".equalsIgnoreCase(ip);
     }
 }
