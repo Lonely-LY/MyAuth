@@ -184,6 +184,9 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
             if (CheckUtils.isObjectEmpty(epayOrders)){
                 return Result.error("商户订单号匹配失败");
             }
+            if(epayOrders.getStatus().equals(1)){
+                return Result.error("订单已成功加款，请勿重复通知");
+            }
             LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
             List<Epay> eapyList = eapyMapper.selectList(epayLambdaQueryWrapper);
             HashMap<String, String> map = new HashMap<>();
