@@ -1199,7 +1199,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{user.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return Result.ok("修改成功、邮箱提醒用户失败、请检查邮箱系统配置。");
+                    return Result.ok("添加成功、邮箱提醒用户失败、请检查邮箱系统配置。");
                 }
             }
         }
@@ -1357,6 +1357,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             int num = userMapper.updateById(selectOne);
             if (num > 0) {
                 redisUtil.del("user:" + softId + ":" + user);
+
+                LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "selfChangeUser");
+                MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
+                if(mailSend.getSendSwitch().equals(1)){
+                    if(!CheckUtils.isObjectEmpty(selectOne.getQq())){
+                        try {
+                            Map<String, Object> map = new HashMap<>();  // 页面的动态数据
+                            map.put("mailTitle",mailSend.getSendTitle());
+                            map.put("name",selectOne.getName());
+                            map.put("username", selectOne.getUser());
+                            map.put("password", selectOne.getPass());
+                            map.put("keyword", selectOne.getCkey());
+                            map.put("DeviceCode",selectOne.getDeviceCode());
+                            map.put("LastIp",selectOne.getLastIp());
+                            map.put("RegTime",CheckUtils.isObjectEmpty(selectOne.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(selectOne.getRegTime().toString())));
+                            map.put("LastTime",CheckUtils.isObjectEmpty(selectOne.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(selectOne.getLastTime().toString())));
+                            Soft obj = (Soft) redisUtil.get("id:soft:"+ selectOne.getFromSoftId());
+                            map.put("SoftName",obj.getName());
+                            if(selectOne.getAuthTime().equals(-1)){
+                                map.put("data", "永久");
+                            }else {
+                                map.put("data", MyUtils.dateToStr(MyUtils.stamp2Date(selectOne.getAuthTime().toString())));
+                            }
+                            map.put("qq", selectOne.getQq());
+                            map.put("point", selectOne.getPoint());
+                            String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                            emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{selectOne.getQq()+"@qq.com"});
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return Result.ok("自助修改账号成功、邮箱提醒用户失败、请检查邮箱系统配置。");
+                        }
+                    }
+                }
                 return Result.ok("修改成功");
             } else {
                 return Result.error("修改失败，请联系管理员");
@@ -1373,6 +1408,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             int num = userMapper.updateById(selectOne);
             if (num > 0) {
                 redisUtil.del("user:" + softId + ":" + user);
+
+                LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "selfChangeUser");
+                MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
+                if(mailSend.getSendSwitch().equals(1)){
+                    if(!CheckUtils.isObjectEmpty(selectOne.getQq())){
+                        try {
+                            Map<String, Object> map = new HashMap<>();  // 页面的动态数据
+                            map.put("mailTitle",mailSend.getSendTitle());
+                            map.put("name",selectOne.getName());
+                            map.put("username", selectOne.getUser());
+                            map.put("password", selectOne.getPass());
+                            map.put("keyword", selectOne.getCkey());
+                            map.put("DeviceCode",selectOne.getDeviceCode());
+                            map.put("LastIp",selectOne.getLastIp());
+                            map.put("RegTime",CheckUtils.isObjectEmpty(selectOne.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(selectOne.getRegTime().toString())));
+                            map.put("LastTime",CheckUtils.isObjectEmpty(selectOne.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(selectOne.getLastTime().toString())));
+                            Soft obj = (Soft) redisUtil.get("id:soft:"+ selectOne.getFromSoftId());
+                            map.put("SoftName",obj.getName());
+                            if(selectOne.getAuthTime().equals(-1)){
+                                map.put("data", "永久");
+                            }else {
+                                map.put("data", MyUtils.dateToStr(MyUtils.stamp2Date(selectOne.getAuthTime().toString())));
+                            }
+                            map.put("qq", selectOne.getQq());
+                            map.put("point", selectOne.getPoint());
+                            String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
+                            emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{selectOne.getQq()+"@qq.com"});
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return Result.ok("自助修改账号成功、邮箱提醒用户失败、请检查邮箱系统配置。");
+                        }
+                    }
+                }
                 return Result.ok("修改成功");
             } else {
                 return Result.error("修改失败，请联系管理员");
