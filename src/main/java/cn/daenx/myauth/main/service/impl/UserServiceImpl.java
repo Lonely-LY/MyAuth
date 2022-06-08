@@ -1042,6 +1042,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 Version obj2 = (Version) redisUtil.get("id:version:" + msgPage.getRecords().get(i).getFromVerId());
                 msgPage.getRecords().get(i).setFromVerName(obj2.getVer());
             }
+            User onlineUser = (User) redisUtil.get("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser());
+            if (!CheckUtils.isObjectEmpty(onlineUser)){
+                msgPage.getRecords().get(i).setOnlineType(1);
+            }else {
+                msgPage.getRecords().get(i).setOnlineType(0);
+            }
         }
         return Result.ok("获取成功", msgPage);
     }
@@ -1264,6 +1270,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if (!CheckUtils.isObjectEmpty(msgPage.getRecords().get(i).getFromVerId())) {
                 Version obj2 = (Version) redisUtil.get("id:version:" + msgPage.getRecords().get(i).getFromVerId());
                 msgPage.getRecords().get(i).setFromVerName(obj2.getVer());
+            }
+            User onlineUser = (User) redisUtil.get("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser());
+            if (!CheckUtils.isObjectEmpty(onlineUser)){
+                msgPage.getRecords().get(i).setOnlineType(1);
+            }else {
+                msgPage.getRecords().get(i).setOnlineType(0);
             }
             msgPage.getRecords().get(i).setFromVerKey(null);
             msgPage.getRecords().get(i).setFromSoftKey(null);

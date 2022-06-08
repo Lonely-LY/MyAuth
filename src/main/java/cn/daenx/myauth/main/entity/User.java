@@ -129,4 +129,10 @@ public class User extends Model {
      * 上级ID
      */
     private Integer fromAdminId;
+
+    /**
+     * 是否在线
+     */
+    @TableField(exist = false)
+    private Integer onlineType;
 }
