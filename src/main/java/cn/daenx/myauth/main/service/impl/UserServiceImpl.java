@@ -1354,6 +1354,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (!CheckUtils.isObjectEmpty(newUser1)) {
             return Result.error("新账号已存在");
         }
+
+        LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "selfChangeUser");
+        MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
+
         if (CheckUtils.isObjectEmpty(selectOne.getPass())) {
             //密码为空，此时必须提供卡密
             if (CheckUtils.isObjectEmpty(ckey)) {
@@ -1369,10 +1374,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             int num = userMapper.updateById(selectOne);
             if (num > 0) {
                 redisUtil.del("user:" + softId + ":" + user);
-
-                LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "selfChangeUser");
-                MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
 
                 if(mailSend.getSendSwitch().equals(1)){
                     if(!CheckUtils.isObjectEmpty(selectOne.getQq())){
@@ -1420,10 +1421,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             int num = userMapper.updateById(selectOne);
             if (num > 0) {
                 redisUtil.del("user:" + softId + ":" + user);
-
-                LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "selfChangeUser");
-                MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
 
                 if(mailSend.getSendSwitch().equals(1)){
                     if(!CheckUtils.isObjectEmpty(selectOne.getQq())){
