@@ -24,6 +24,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,10 +112,44 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
      */
     @Override
     public Result getAllPayType() {
-        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        epayLambdaQueryWrapper.select(Epay::getId,Epay::getName,Epay::getWxpaySwitch,Epay::getAlipaySwitch,Epay::getQqpaySwitch);
-        List<Map<String, Object>> epays = eapyMapper.selectMaps(epayLambdaQueryWrapper);
-        return Result.ok("获取成功",epays.stream().map(MapUtil::toCamelCaseMap).collect(Collectors.toList()));
+        Map<String,Object> epays = new HashMap<>();
+        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper1 = new LambdaQueryWrapper<>();
+        epayLambdaQueryWrapper1.select(Epay::getId,Epay::getName,Epay::getWxpaySwitch,Epay::getAlipaySwitch,Epay::getQqpaySwitch);
+        epayLambdaQueryWrapper1.eq(Epay::getWxpaySwitch,1);
+        List<Epay> epays1 = eapyMapper.selectList(epayLambdaQueryWrapper1);
+        List<Map<String,Object>> pay1 = new ArrayList<>();
+        for (Epay epay : epays1) {
+            Map<String,Object> map = new HashMap<>();
+            map.put("id",epay.getId());
+            map.put("name",epay.getName());
+            pay1.add(map);
+        }
+        epays.put("wxpay",pay1);
+        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper2 = new LambdaQueryWrapper<>();
+        epayLambdaQueryWrapper2.select(Epay::getId,Epay::getName,Epay::getWxpaySwitch,Epay::getAlipaySwitch,Epay::getQqpaySwitch);
+        epayLambdaQueryWrapper2.eq(Epay::getAlipaySwitch,1);
+        List<Epay> epays2 = eapyMapper.selectList(epayLambdaQueryWrapper2);
+        List<Map<String,Object>> pay2 = new ArrayList<>();
+        for (Epay epay : epays2) {
+            Map<String,Object> map = new HashMap<>();
+            map.put("id",epay.getId());
+            map.put("name",epay.getName());
+            pay2.add(map);
+        }
+        epays.put("alipay",pay2);
+        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper3 = new LambdaQueryWrapper<>();
+        epayLambdaQueryWrapper3.select(Epay::getId,Epay::getName,Epay::getWxpaySwitch,Epay::getAlipaySwitch,Epay::getQqpaySwitch);
+        epayLambdaQueryWrapper3.eq(Epay::getQqpaySwitch,1);
+        List<Epay> epays3 = eapyMapper.selectList(epayLambdaQueryWrapper3);
+        List<Map<String,Object>> pay3 = new ArrayList<>();
+        for (Epay epay : epays3) {
+            Map<String,Object> map = new HashMap<>();
+            map.put("id",epay.getId());
+            map.put("name",epay.getName());
+            pay3.add(map);
+        }
+        epays.put("qqpay",pay3);
+        return Result.ok("获取成功",epays);
     }
 
     /**
