@@ -18,6 +18,11 @@ public class Epay extends Model {
 
 
     /**
+     * 通道名称
+     */
+    private String name;
+
+    /**
      * 易支付接口地址
      */
     private String url;
@@ -41,5 +46,20 @@ public class Epay extends Model {
      * 支付成功跳转地址
      */
     private String returnUrl;
+
+    /**
+     * 微信支付开关(1开启0关闭)
+     */
+    private Integer wxpaySwitch;
+
+    /**
+     * 支付宝支付开关(1开启0关闭)
+     */
+    private Integer alipaySwitch;
+
+    /**
+     * QQ支付开关(1开启0关闭)
+     */
+    private Integer qqpaySwitch;
 
 }

@@ -29,7 +29,7 @@ public enum SoftEnums {
     REGISTER_DISABLE(0,"关闭注册"),
     REGISTER_ABLE(1,"开启注册"),
 
-    DIFF_TIME(30,"允许时间戳误差");
+    DIFF_TIME(120,"允许时间戳误差");
     private Integer code;
     private String desc;
     private static final Map<Integer, String> codeMap;

@@ -1,5 +1,6 @@
 package cn.daenx.myauth.main.service;
 
+import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.Admin;
 import cn.daenx.myauth.main.entity.Epay;
@@ -18,7 +19,7 @@ public interface IEpayService extends IService<Epay> {
      *
      * @return
      */
-    Result getEpay();
+    Result getEpay(Epay epay, MyPage myPage);
 
 
     /**
@@ -30,13 +31,20 @@ public interface IEpayService extends IService<Epay> {
     Result editEpay(Epay epay);
 
     /**
+     * 获取所有已开启的支付类型
+     *
+     * @return
+     */
+    Result getAllPayType();
+
+    /**
      * 充值金额
      *
      * @param money
      * @param admin
      * @return
      */
-    Result depositMoneyLink(BigDecimal money , String type , Admin admin);
+    Result depositMoneyLink(Integer payId,String payName,BigDecimal money , String type , Admin admin);
 
     /**
      * 处理epay异步通知

@@ -165,17 +165,22 @@ CREATE TABLE `ma_data`  (
 DROP TABLE IF EXISTS `ma_epay_config`;
 CREATE TABLE `ma_epay_config`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '通道名称',
   `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '易支付API地址',
   `pid` int(11) NULL DEFAULT NULL COMMENT '商户ID',
   `ekey` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户密匙',
   `notify_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '异步通知地址(后端地址)',
   `return_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付成功跳转地址',
+  `wxpay_switch` int(11) NULL DEFAULT 0 COMMENT '微信开关',
+  `alipay_switch` int(11) NULL DEFAULT 0 COMMENT '支付宝开关',
+  `qqpay_switch` int(11) NULL DEFAULT 0 COMMENT 'QQ支付开关',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ma_epay_config
 -- ----------------------------
+INSERT INTO `ma_epay_config` VALUES (1, '易支付', '', NULL, '', '', '', 0, 0, 0);
 
 -- ----------------------------
 -- Table structure for ma_epay_orders

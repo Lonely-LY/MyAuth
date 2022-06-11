@@ -1,5 +1,6 @@
 package cn.daenx.myauth.main.service.impl;
 
+import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.*;
 import cn.daenx.myauth.main.mapper.AdminMapper;
@@ -11,9 +12,12 @@ import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.util.EpayUtil;
 import cn.daenx.myauth.util.MyUtils;
 import cn.daenx.myauth.util.RedisUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -23,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author
@@ -47,14 +52,37 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
      * @return
      */
     @Override
-    public Result getEpay() {
-        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        List<Epay> eapyList = eapyMapper.selectList(epayLambdaQueryWrapper);
-        if (eapyList.size() == 0) {
-            return Result.error("设置获取失败或者没有设置,请直接新增");
-        } else {
-            return Result.ok("获取成功", eapyList.get(0));
+    public Result getEpay(Epay epay, MyPage myPage) {
+        Page<Epay> page = new Page<>(myPage.getPageIndex(), myPage.getPageSize(), true);
+        if (!CheckUtils.isObjectEmpty(myPage.getOrders())) {
+            for (int i = 0; i < myPage.getOrders().size(); i++) {
+                myPage.getOrders().get(i).setColumn(MyUtils.camelToUnderline(myPage.getOrders().get(i).getColumn()));
+            }
+            page.setOrders(myPage.getOrders());
         }
+        IPage<Epay> epayPage = eapyMapper.selectPage(page, getQwEpayOrders(epay));
+        return Result.ok("获取成功", epayPage);
+    }
+
+    /**
+     * 获取查询条件构造器
+     *
+     * @param epay
+     * @return
+     */
+    public LambdaQueryWrapper<Epay> getQwEpayOrders(Epay epay) {
+        LambdaQueryWrapper<Epay> LambdaQueryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getId()),Epay::getId,epay.getId());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getName()),Epay::getName,epay.getName());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getUrl()),Epay::getUrl,epay.getUrl());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getPid()),Epay::getPid,epay.getPid());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getEkey()),Epay::getEkey,epay.getEkey());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getNotifyUrl()),Epay::getNotifyUrl,epay.getNotifyUrl());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getReturnUrl()),Epay::getReturnUrl,epay.getReturnUrl());
+        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getWxpaySwitch()),Epay::getWxpaySwitch,epay.getWxpaySwitch());
+        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getAlipaySwitch()),Epay::getAlipaySwitch,epay.getAlipaySwitch());
+        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getQqpaySwitch()),Epay::getQqpaySwitch,epay.getQqpaySwitch());
+        return LambdaQueryWrapper;
     }
 
     /**
@@ -66,25 +94,27 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
     @Override
     public Result editEpay(Epay epay) {
         LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        List<Epay> eapyList = eapyMapper.selectList(epayLambdaQueryWrapper);
-        if (eapyList.size() == 0) {
-            int num = eapyMapper.insert(epay);
-            if (num == 0) {
-                return Result.error("设置修改失败");
-            } else {
-                return Result.ok("设置修改成功");
-            }
+        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getId()),Epay::getId,epay.getId());
+        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getName()),Epay::getName,epay.getName());
+        int num = eapyMapper.update(epay, epayLambdaQueryWrapper);
+        if (num == 0) {
+            return Result.error("设置修改失败");
         } else {
-            epay.setId(null);
-            LambdaQueryWrapper<Epay> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(Epay::getId, eapyList.get(0).getId());
-            int num = eapyMapper.update(epay, queryWrapper);
-            if (num == 0) {
-                return Result.error("设置修改失败");
-            } else {
-                return Result.ok("设置修改成功");
-            }
+            return Result.ok("设置修改成功");
         }
+    }
+
+    /**
+     * 获取所有以开启的支付类型
+     *
+     * @return
+     */
+    @Override
+    public Result getAllPayType() {
+        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        epayLambdaQueryWrapper.select(Epay::getId,Epay::getName,Epay::getWxpaySwitch,Epay::getAlipaySwitch,Epay::getQqpaySwitch);
+        List<Map<String, Object>> epays = eapyMapper.selectMaps(epayLambdaQueryWrapper);
+        return Result.ok("获取成功",epays.stream().map(MapUtil::toCamelCaseMap).collect(Collectors.toList()));
     }
 
     /**
@@ -96,17 +126,30 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
      * @return
      */
     @Override
-    public Result depositMoneyLink(BigDecimal money , String type , Admin admin)  {
+    public Result depositMoneyLink(Integer payId , String payName , BigDecimal money , String type , Admin admin)  {
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
         if (role.getFromSoftId() == 0) {
             return Result.error("超级管理员无法使用此接口");
         }
         LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(payId),Epay::getId,payId);
+        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(payName),Epay::getName,payName);
         List<Epay> eapyList = eapyMapper.selectList(epayLambdaQueryWrapper);
         Config config = (Config) redisUtil.get("config");
         if (CheckUtils.isObjectEmpty(config) || CheckUtils.isObjectEmpty(eapyList)) {
             return Result.error("设置获取失败，请检查");
         }
+        if (type.equals("wxpay") && eapyList.get(0).getWxpaySwitch().equals(0)){
+            return Result.error("当前支付方式未开启");
+        }
+        if (type.equals("alipay") && eapyList.get(0).getAlipaySwitch().equals(0)){
+            return Result.error("当前支付方式未开启");
+        }
+        if (type.equals("qqpay") && eapyList.get(0).getQqpaySwitch().equals(0)){
+            return Result.error("当前支付方式未开启");
+        }
+
+        //以下是易支付流程，多通道实现时需要调整
         String webSite = MyUtils.removeDH(eapyList.get(0).getUrl());//易支付网站地址
         String out_trade_no = EpayUtil.getOrderIdByTime(admin.getId());//生成订单号
         HashMap<String, String> map = new HashMap<>();

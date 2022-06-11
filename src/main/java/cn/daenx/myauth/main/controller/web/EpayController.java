@@ -1,6 +1,7 @@
 package cn.daenx.myauth.main.controller.web;
 
 import cn.daenx.myauth.base.annotation.AdminLogin;
+import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.main.entity.Admin;
 import cn.daenx.myauth.main.entity.Epay;
 import cn.daenx.myauth.main.service.IEpayService;
@@ -47,13 +48,8 @@ public class EpayController {
         if (CheckUtils.isObjectEmpty(epay)) {
             return Result.error("参数错误");
         }
-        if (CheckUtils.isObjectEmpty(epay.getUrl()) &&
-                CheckUtils.isObjectEmpty(epay.getPid()) &&
-                CheckUtils.isObjectEmpty(epay.getEkey()) &&
-                CheckUtils.isObjectEmpty(epay.getNotifyUrl()) &&
-                CheckUtils.isObjectEmpty(epay.getReturnUrl()))
-        {
-            return Result.error("全部参数均不能为空");
+        if (CheckUtils.isObjectEmpty(epay.getId()) && CheckUtils.isObjectEmpty(epay.getName())){
+            return Result.error("ID和名称必填其一");
         }
         return epayService.editEpay(epay);
     }
@@ -67,11 +63,23 @@ public class EpayController {
      */
     @NoEncryptNoSign
     @AdminLogin(is_admin = true)
-    @GetMapping("getEpay")
+    @PostMapping("getEpay")
     public Result getEpay(HttpServletRequest request) {
-        return epayService.getEpay();
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+        MyPage myPage = jsonObject.toJavaObject(MyPage.class);
+        Epay epay = jsonObject.toJavaObject(Epay.class);
+        if (CheckUtils.isObjectEmpty(myPage.getPageIndex()) || CheckUtils.isObjectEmpty(myPage.getPageSize())) {
+            return Result.error("页码和尺寸参数不能为空");
+        }
+        return epayService.getEpay(epay,myPage);
     }
 
+    @NoEncryptNoSign
+    @AdminLogin(is_super_role = false)
+    @GetMapping("getAllPayType")
+    public Result getAllPayType(HttpServletRequest request){
+        return epayService.getAllPayType();
+    }
 
 
     @NoEncryptNoSign
@@ -81,11 +89,16 @@ public class EpayController {
         Admin admin = (Admin) request.getAttribute("obj_admin");
         JSONObject jsonObject = (JSONObject) request.getAttribute("json");
         BigDecimal money = jsonObject.getBigDecimal("money");
+        Integer payId = jsonObject.getInteger("payId");
+        String payName = jsonObject.getString("payName");
         String type = jsonObject.getString("type");
-        if(CheckUtils.isObjectEmpty(money) && CheckUtils.isObjectEmpty(type)){
+        if (CheckUtils.isObjectEmpty(payId) && CheckUtils.isObjectEmpty(payName)){
+            return Result.error("通道参数不能都为空");
+        }
+        if(CheckUtils.isObjectEmpty(money) || CheckUtils.isObjectEmpty(type)){
             return Result.error("参数错误");
         }
-        return epayService.depositMoneyLink(money,type,admin);
+        return epayService.depositMoneyLink(payId,payName,money,type,admin);
     }
 
 

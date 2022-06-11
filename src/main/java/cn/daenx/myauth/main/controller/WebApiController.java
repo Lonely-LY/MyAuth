@@ -176,6 +176,89 @@ public class WebApiController {
     }
 
     /**
+     * 自助使用卡密
+     *
+     * @param request
+     * @return
+     */
+    @NoEncryptNoSign
+    @PostMapping("selfUseCkey")
+    public Result selfUseCkey(HttpServletRequest request) {
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+        String user = jsonObject.getString("user");
+        String skey = jsonObject.getString("skey");
+        String ckey = jsonObject.getString("ckey");
+        if (CheckUtils.isObjectEmpty(user)) {
+            return Result.error("账号不能为空");
+        }
+        if (CheckUtils.isObjectEmpty(ckey)) {
+            return Result.error("卡密不能为空");
+        }
+        User newUser = new User().setUser(user).setCkey(ckey);
+        if (CheckUtils.isObjectEmpty(skey)) {
+            return Result.error("skey不能为空");
+        }
+        Soft soft = (Soft) redisUtil.get("soft:" + skey);
+        if (CheckUtils.isObjectEmpty(soft)) {
+            return Result.error("skey错误");
+        }
+        if (soft.getStatus().equals(SoftEnums.STATUS_FIX.getCode())) {
+            return Result.error("软件维护中");
+        }
+        if (soft.getStatus().equals(SoftEnums.STATUS_DISABLE.getCode())) {
+            return Result.error("软件已停用");
+        }
+        return userService.useCkey(newUser,soft);
+    }
+
+    /**
+     * 自助解绑
+     *
+     * @param request
+     * @return
+     */
+    @NoEncryptNoSign
+    @PostMapping("selfUnbind")
+    public Result selfUnbind(HttpServletRequest request) {
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+        String user = jsonObject.getString("user");
+        String ckey = jsonObject.getString("ckey");
+        String pass = jsonObject.getString("pass");
+        String skey = jsonObject.getString("skey");
+
+        if (CheckUtils.isObjectEmpty(user)) {
+            return Result.error("账号不能为空");
+        }
+        if (CheckUtils.isObjectEmpty(ckey) && CheckUtils.isObjectEmpty(pass)) {
+            return Result.error("卡密和密码不能都为空");
+        }
+        User newUser = new User().setUser(user).setCkey(ckey);
+        if (CheckUtils.isObjectEmpty(skey)) {
+            return Result.error("skey不能为空");
+        }
+        Soft soft = (Soft) redisUtil.get("soft:" + skey);
+        if (CheckUtils.isObjectEmpty(soft)) {
+            return Result.error("skey错误");
+        }
+
+        if (!userService.queryUserPassCKey(user,pass,ckey,soft)){
+            return Result.error("密码或者最后使用卡密不匹配");
+        }
+
+        if (soft.getStatus().equals(SoftEnums.STATUS_FIX.getCode())) {
+            return Result.error("软件维护中");
+        }
+        if (soft.getStatus().equals(SoftEnums.STATUS_DISABLE.getCode())) {
+            return Result.error("软件已停用");
+        }
+
+        newUser.setDeviceInfo("");
+        newUser.setDeviceCode("");
+        newUser.setToken("");
+        return userService.unbind(newUser,soft);
+    }
+
+    /**
      * 查询账号信息
      *
      * @param user

@@ -818,11 +818,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      */
     @Override
     public Result unbind(User userA, Soft softC) {
+        LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        userLambdaQueryWrapper.eq(User::getUser,userA.getUser());
+        userLambdaQueryWrapper.eq(User::getFromSoftId,softC.getId());
+        User userC = userMapper.selectOne(userLambdaQueryWrapper);
+        userA.setId(userC.getId());
         int num = userMapper.updateById(userA);
         if (num == 0) {
             return Result.error("解绑失败");
         }
-
+        userC = userMapper.selectOne(userLambdaQueryWrapper);
         LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
         mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "unbind");
         MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
@@ -831,29 +836,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         jsonObject.put("user", userA.getUser());
         redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
         if(mailSend.getSendSwitch().equals(1)){
-            if(!CheckUtils.isObjectEmpty(userA.getQq())){
+            if(!CheckUtils.isObjectEmpty(userC.getQq())){
                 try {
                     Map<String, Object> map = new HashMap<>();  // 页面的动态数据
                     map.put("mailTitle",mailSend.getSendTitle());
-                    map.put("name",userA.getName());
-                    map.put("username", userA.getUser());
-                    map.put("password", userA.getPass());
-                    map.put("keyword", userA.getCkey());
-                    map.put("DeviceCode",userA.getDeviceCode());
-                    map.put("LastIp",userA.getLastIp());
-                    map.put("RegTime",CheckUtils.isObjectEmpty(userA.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getRegTime().toString())));
-                    map.put("LastTime",CheckUtils.isObjectEmpty(userA.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userA.getLastTime().toString())));
-                    Soft obj = (Soft) redisUtil.get("id:soft:"+ userA.getFromSoftId());
+                    map.put("name",userC.getName());
+                    map.put("username", userC.getUser());
+                    map.put("password", userC.getPass());
+                    map.put("keyword", userC.getCkey());
+                    map.put("DeviceCode",userC.getDeviceCode());
+                    map.put("LastIp",userC.getLastIp());
+                    map.put("RegTime",CheckUtils.isObjectEmpty(userC.getRegTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userC.getRegTime().toString())));
+                    map.put("LastTime",CheckUtils.isObjectEmpty(userC.getLastTime()) ? "" : MyUtils.dateToStr(MyUtils.stamp2Date(userC.getLastTime().toString())));
+                    Soft obj = (Soft) redisUtil.get("id:soft:"+ userC.getFromSoftId());
                     map.put("SoftName",obj.getName());
-                    if(userA.getAuthTime().equals(-1)){
+                    if(userC.getAuthTime().equals(-1)){
                         map.put("data", "永久");
                     }else {
-                        map.put("data", MyUtils.dateToStr(MyUtils.stamp2Date(userA.getAuthTime().toString())));
+                        map.put("data", MyUtils.dateToStr(MyUtils.stamp2Date(userC.getAuthTime().toString())));
                     }
-                    map.put("qq", userA.getQq());
-                    map.put("point", userA.getPoint());
+                    map.put("qq", userC.getQq());
+                    map.put("point", userC.getPoint());
                     String sendTemplates = TemplateParseUtil.regParse(mailSend.getSendTemplates(),map);
-                    emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{userA.getQq()+"@qq.com"});
+                    emailService.sendFullTextEmail(mailSend.getSendTheme(),sendTemplates,new String[]{userC.getQq()+"@qq.com"});
                 } catch (Exception e) {
                     e.printStackTrace();
                     return Result.ok("解绑成功、邮箱提醒用户失败、请检查邮箱系统配置。");
@@ -1528,6 +1533,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         jsonObject.put("role", role.getName());
         jsonObject.put("fromSoftName", soft.getName());
         return Result.ok("查询成功", jsonObject);
+    }
+
+    /**
+     * 验证用户卡密或密码能匹配返回true，不能匹配返回false
+     *
+     * @param user
+     * @param pass
+     * @param ckey
+     * @param soft
+     * @return
+     */
+    @Override
+    public boolean queryUserPassCKey(String user, String pass, String ckey , Soft soft) {
+        LambdaQueryWrapper<User> userLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        userLambdaQueryWrapper.eq(User::getUser,user);
+        userLambdaQueryWrapper.eq(User::getFromSoftId,soft.getId());
+        userLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(pass),User::getPass,pass);
+        userLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(ckey),User::getCkey,ckey);
+        User nowUser = userMapper.selectOne(userLambdaQueryWrapper);
+        return !CheckUtils.isObjectEmpty(nowUser);
     }
 
     /**

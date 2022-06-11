@@ -181,4 +181,12 @@ public interface IUserService extends IService<User> {
      * @return
      */
     Result queryAdminInfo(String user, Soft soft);
+
+    /**
+     * 验证用户卡密密码
+     *
+     * @param user
+     * @return
+     */
+    boolean queryUserPassCKey(String user , String pass , String ckey , Soft soft);
 }
