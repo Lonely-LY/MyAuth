@@ -1,6 +1,7 @@
 package cn.daenx.myauth.main.service.impl;
 
 import cn.daenx.myauth.base.vo.MyPage;
+import cn.daenx.myauth.base.vo.PayConfig;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.*;
 import cn.daenx.myauth.main.mapper.AdminMapper;
@@ -14,6 +15,7 @@ import cn.daenx.myauth.util.MyUtils;
 import cn.daenx.myauth.util.RedisUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,7 +26,6 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,14 +76,12 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
         LambdaQueryWrapper<Epay> LambdaQueryWrapper = new LambdaQueryWrapper<>();
         LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getId()),Epay::getId,epay.getId());
         LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getName()),Epay::getName,epay.getName());
-        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getUrl()),Epay::getUrl,epay.getUrl());
-        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getPid()),Epay::getPid,epay.getPid());
-        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getEkey()),Epay::getEkey,epay.getEkey());
-        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getNotifyUrl()),Epay::getNotifyUrl,epay.getNotifyUrl());
-        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getReturnUrl()),Epay::getReturnUrl,epay.getReturnUrl());
-        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getWxpaySwitch()),Epay::getWxpaySwitch,epay.getWxpaySwitch());
-        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getAlipaySwitch()),Epay::getAlipaySwitch,epay.getAlipaySwitch());
-        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getQqpaySwitch()),Epay::getQqpaySwitch,epay.getQqpaySwitch());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getDriver()),Epay::getDriver,epay.getDriver());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getConfig()),Epay::getConfig,epay.getConfig());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getContent()),Epay::getContent,epay.getContent());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epay.getUpdateTime()),Epay::getUpdateTime,epay.getUpdateTime());
+        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getEnabled()),Epay::getEnabled,epay.getEnabled());
+        LambdaQueryWrapper.orderBy(true,true,Epay::getSort);
         return LambdaQueryWrapper;
     }
 
@@ -96,7 +95,8 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
     public Result editEpay(Epay epay) {
         LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
         epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getId()),Epay::getId,epay.getId());
-        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getName()),Epay::getName,epay.getName());
+        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epay.getDriver()),Epay::getDriver,epay.getDriver());
+        epay.setUpdateTime(Integer.valueOf(MyUtils.getTimeStamp()));
         int num = eapyMapper.update(epay, epayLambdaQueryWrapper);
         if (num == 0) {
             return Result.error("设置修改失败");
@@ -112,103 +112,94 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
      */
     @Override
     public Result getAllPayType() {
-        Map<String,Object> epays = new HashMap<>();
-        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper1 = new LambdaQueryWrapper<>();
-        epayLambdaQueryWrapper1.select(Epay::getId,Epay::getName,Epay::getWxpaySwitch,Epay::getAlipaySwitch,Epay::getQqpaySwitch);
-        epayLambdaQueryWrapper1.eq(Epay::getWxpaySwitch,1);
-        List<Epay> epays1 = eapyMapper.selectList(epayLambdaQueryWrapper1);
-        List<Map<String,Object>> pay1 = new ArrayList<>();
-        for (Epay epay : epays1) {
-            Map<String,Object> map = new HashMap<>();
-            map.put("id",epay.getId());
-            map.put("name",epay.getName());
-            pay1.add(map);
-        }
-        epays.put("wxpay",pay1);
-        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper2 = new LambdaQueryWrapper<>();
-        epayLambdaQueryWrapper2.select(Epay::getId,Epay::getName,Epay::getWxpaySwitch,Epay::getAlipaySwitch,Epay::getQqpaySwitch);
-        epayLambdaQueryWrapper2.eq(Epay::getAlipaySwitch,1);
-        List<Epay> epays2 = eapyMapper.selectList(epayLambdaQueryWrapper2);
-        List<Map<String,Object>> pay2 = new ArrayList<>();
-        for (Epay epay : epays2) {
-            Map<String,Object> map = new HashMap<>();
-            map.put("id",epay.getId());
-            map.put("name",epay.getName());
-            pay2.add(map);
-        }
-        epays.put("alipay",pay2);
-        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper3 = new LambdaQueryWrapper<>();
-        epayLambdaQueryWrapper3.select(Epay::getId,Epay::getName,Epay::getWxpaySwitch,Epay::getAlipaySwitch,Epay::getQqpaySwitch);
-        epayLambdaQueryWrapper3.eq(Epay::getQqpaySwitch,1);
-        List<Epay> epays3 = eapyMapper.selectList(epayLambdaQueryWrapper3);
-        List<Map<String,Object>> pay3 = new ArrayList<>();
-        for (Epay epay : epays3) {
-            Map<String,Object> map = new HashMap<>();
-            map.put("id",epay.getId());
-            map.put("name",epay.getName());
-            pay3.add(map);
-        }
-        epays.put("qqpay",pay3);
-        return Result.ok("获取成功",epays);
+        LambdaQueryWrapper<Epay> payLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        payLambdaQueryWrapper.select(Epay::getId,Epay::getName,Epay::getDriver,Epay::getContent);
+        payLambdaQueryWrapper.eq(Epay::getEnabled,1);
+        payLambdaQueryWrapper.orderBy(true,true,Epay::getSort);
+        List<Map<String, Object>> maps = eapyMapper.selectMaps(payLambdaQueryWrapper);
+        return Result.ok("获取成功", maps.stream().map(MapUtil::toCamelCaseMap).collect(Collectors.toList()));
     }
 
     /**
-     * 生成epay下单链接
+     * 生成充值链接
      *
+     * @param payId
+     * @param payDriver
      * @param money
-     * @param type
      * @param admin
      * @return
      */
     @Override
-    public Result depositMoneyLink(Integer payId , String payName , BigDecimal money , String type , Admin admin)  {
+    public Result depositMoneyLink(Integer payId , String payDriver , BigDecimal money , Admin admin) {
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
         if (role.getFromSoftId() == 0) {
             return Result.error("超级管理员无法使用此接口");
         }
         LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(payId),Epay::getId,payId);
-        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(payName),Epay::getName,payName);
-        List<Epay> eapyList = eapyMapper.selectList(epayLambdaQueryWrapper);
+        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(payId), Epay::getId, payId);
+        epayLambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(payDriver), Epay::getDriver, payDriver);
+        Epay epay = eapyMapper.selectOne(epayLambdaQueryWrapper);
         Config config = (Config) redisUtil.get("config");
-        if (CheckUtils.isObjectEmpty(config) || CheckUtils.isObjectEmpty(eapyList)) {
+        if (CheckUtils.isObjectEmpty(config) || CheckUtils.isObjectEmpty(epay)) {
             return Result.error("设置获取失败，请检查");
         }
-        if (type.equals("wxpay") && eapyList.get(0).getWxpaySwitch().equals(0)){
-            return Result.error("当前支付方式未开启");
+        if (epay.getEnabled().equals(0)){
+            return Result.error("此接口以关闭");
         }
-        if (type.equals("alipay") && eapyList.get(0).getAlipaySwitch().equals(0)){
-            return Result.error("当前支付方式未开启");
+        JSONArray array = JSONUtil.parseArray(epay.getConfig());
+        List<PayConfig> payConfigs = JSONUtil.toList(array, PayConfig.class);
+        String pid = null;
+        String url = null;
+        String notify_url = null;
+        String return_url = null;
+        String key = null;
+        String type = null;
+        if (payDriver.equals("epay_wxpay")){
+            type = "wxpay";
         }
-        if (type.equals("qqpay") && eapyList.get(0).getQqpaySwitch().equals(0)){
-            return Result.error("当前支付方式未开启");
+        if (payDriver.equals("epay_alipay")){
+            type = "alipay";
         }
-
-        //以下是易支付流程，多通道实现时需要调整
-        String webSite = MyUtils.removeDH(eapyList.get(0).getUrl());//易支付网站地址
+        if (payDriver.equals("epay_qqpay")){
+            type = "qqpay";
+        }
+        for (PayConfig payConfig : payConfigs) {
+            if (payConfig.getFieldName().equals("url")) {
+                url = payConfig.getFieldText();
+            }
+            if (payConfig.getFieldName().equals("pid")) {
+                pid = payConfig.getFieldText();
+            }
+            if (payConfig.getFieldName().equals("key")) {
+                key = payConfig.getFieldText();
+            }
+            if (payConfig.getFieldName().equals("notify_url")) {
+                notify_url = payConfig.getFieldText();
+            }
+            if (payConfig.getFieldName().equals("return_url")) {
+                return_url = payConfig.getFieldText();
+            }
+        }
         String out_trade_no = EpayUtil.getOrderIdByTime(admin.getId());//生成订单号
         HashMap<String, String> map = new HashMap<>();
-        map.put("pid",String.valueOf(eapyList.get(0).getPid()));//pid
-        map.put("type",type);//支付方式,alipay:支付宝,wxpay:微信支付,qqpay:QQ钱包
-        map.put("out_trade_no",out_trade_no);//订单号,自己生成
-        map.put("notify_url",MyUtils.removeDH(eapyList.get(0).getNotifyUrl()) + "/myauth/web/epayNotify");//服务器异步通知地址
-        map.put("return_url",eapyList.get(0).getReturnUrl());//页面跳转通知地址
-        map.put("name",admin.getUser() + "余额充值");//商品名称
-        map.put("money",String.valueOf(money));//金额
-        //兼容彩虹易支付,取消网站名称的提交
-        //map.put("sitename",config.getSeoTitle());//网站名称
-        String key = eapyList.get(0).getEkey();//易支付秘钥
+        map.put("pid", pid);//pid
+        map.put("type", type);//支付方式,alipay:支付宝,wxpay:微信支付,qqpay:QQ钱包
+        map.put("out_trade_no", out_trade_no);//订单号,自己生成
+        map.put("notify_url", MyUtils.removeDH(notify_url) + "/myauth/web/epayNotify");//服务器异步通知地址
+        map.put("return_url", return_url);//页面跳转通知地址
+        map.put("name", admin.getUser() + "余额充值");//商品名称
+        map.put("money", String.valueOf(money));//金额
         map = (HashMap<String, String>) EpayUtil.sortByKey(map);
         String signStr = "";
         //遍历map 转成字符串
-        for(Map.Entry<String,String> m :map.entrySet()){
+        for (Map.Entry<String, String> m : map.entrySet()) {
             //不拼接值为空的字段
-            if(!CheckUtils.isObjectEmpty(m.getValue())){
-                signStr += m.getKey() + "=" +m.getValue()+"&";
+            if (!CheckUtils.isObjectEmpty(m.getValue())) {
+                signStr += m.getKey() + "=" + m.getValue() + "&";
             }
         }
         //去掉最后一个 &
-        signStr = signStr.substring(0,signStr.length()-1);
+        signStr = signStr.substring(0, signStr.length() - 1);
         //保存一次提交数据
         String s = signStr;
         //最后加上key等待MD5
@@ -216,17 +207,17 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
         //转为MD5
         signStr = DigestUtils.md5DigestAsHex(signStr.getBytes());
         //跳转支付的url地址
-        String s1 = webSite + "/submit.php?" + s + "&sign=" + signStr + "&sign_type=MD5";
+        String s1 = url + "/submit.php?" + s + "&sign=" + signStr + "&sign_type=MD5";
         EpayOrders epayOrders = new EpayOrders();
         epayOrders.setOutTradeNo(out_trade_no);
-        epayOrders.setType(type);
+        epayOrders.setType(epay.getDriver());
         epayOrders.setAddtime(MyUtils.dateToStr(MyUtils.stamp2Date(MyUtils.getTimeStamp())));
         epayOrders.setName(admin.getUser() + "余额充值");
         epayOrders.setMoney(String.valueOf(money));
         epayOrders.setStatus(0);
         epayOrders.setFromAdminId(admin.getId());
         epayOrdersMapper.insert(epayOrders);
-        return Result.ok(s1,epayOrders);
+        return Result.ok(s1, epayOrders);
     }
 
     /**
@@ -257,7 +248,6 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
         if(trade_status.equals("TRADE_SUCCESS")){
             LambdaQueryWrapper<EpayOrders> LambdaQueryWrapper = new LambdaQueryWrapper<>();
             LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(out_trade_no), EpayOrders::getOutTradeNo, out_trade_no);
-            LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(type), EpayOrders::getType, type);
             EpayOrders epayOrders = epayOrdersMapper.selectOne(LambdaQueryWrapper);
             if (CheckUtils.isObjectEmpty(epayOrders)){
                 return Result.error("商户订单号匹配失败");
@@ -266,7 +256,26 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
                 return Result.error("订单已成功加款，请勿重复通知");
             }
             LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            List<Epay> eapyList = eapyMapper.selectList(epayLambdaQueryWrapper);
+            epayLambdaQueryWrapper.eq(type.equals("wxpay"),Epay::getDriver,"epay_wxpay");
+            epayLambdaQueryWrapper.eq(type.equals("alipay"),Epay::getDriver,"epay_alipay");
+            epayLambdaQueryWrapper.eq(type.equals("qqpay"),Epay::getDriver,"epay_qqpay");
+            Epay epay = eapyMapper.selectOne(epayLambdaQueryWrapper);
+            JSONArray array = JSONUtil.parseArray(epay.getConfig());
+            List<PayConfig> payConfigs = JSONUtil.toList(array, PayConfig.class);
+            String ePid = null;
+            String url = null;
+            String key = null;
+            for (PayConfig payConfig : payConfigs) {
+                if (payConfig.getFieldName().equals("url")) {
+                    url = payConfig.getFieldText();
+                }
+                if (payConfig.getFieldName().equals("pid")) {
+                    ePid = payConfig.getFieldText();
+                }
+                if (payConfig.getFieldName().equals("key")) {
+                    key = payConfig.getFieldText();
+                }
+            }
             HashMap<String, String> map = new HashMap<>();
             map.put("pid",String.valueOf(pid));//pid
             map.put("trade_no",trade_no);//易支付订单号
@@ -275,7 +284,6 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
             map.put("name",name);//商品名称
             map.put("money",money);//商品金额
             map.put("trade_status",trade_status);//订单状态
-            String key = eapyList.get(0).getEkey();//易支付秘钥
             map = (HashMap<String, String>) EpayUtil.sortByKey(map);
             String signStr = "";
             //遍历map 转成字符串
@@ -294,10 +302,10 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
             if (signStr.equals(sign) && sign_type.equals("MD5")){
                 HashMap<String, Object> paramMap = new HashMap<>();
                 paramMap.put("act", "order");
-                paramMap.put("pid", eapyList.get(0).getPid());
-                paramMap.put("key", eapyList.get(0).getEkey());
+                paramMap.put("pid", ePid);
+                paramMap.put("key", key);
                 paramMap.put("out_trade_no", out_trade_no);
-                String result = HttpUtil.get(MyUtils.removeDH(eapyList.get(0).getUrl()) + "/api.php", paramMap);
+                String result = HttpUtil.get(MyUtils.removeDH(url) + "/api.php", paramMap);
                 EpayOrders epayOrders1 = JSONUtil.toBean(result, EpayOrders.class);
                 if(CheckUtils.isObjectEmpty(epayOrders1) || epayOrders1.getStatus().equals(0)){
                     return Result.error("订单接收通知成功,异步验证订单失败");
@@ -315,7 +323,7 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
                 alog.setMoney(epayOrders1.getMoney());
                 alog.setAfterMoney(nowMoney);
                 alog.setAdminId(admin.getId());
-                alog.setData("后台充值：" + "支付方式" + epayOrders1.getType() + ",充值金额" + epayOrders1.getMoney());
+                alog.setData("后台充值：" + "支付方式" + epay.getDriver() + ",充值金额" + epayOrders1.getMoney());
                 alog.setType("后台充值");
                 alog.setAddTime(Integer.valueOf(MyUtils.getTimeStamp()));
                 epayOrdersMapper.updateById(epayOrders);

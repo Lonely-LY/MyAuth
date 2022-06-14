@@ -2,15 +2,12 @@ package cn.daenx.myauth.main.service.impl;
 
 import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.base.vo.Result;
-import cn.daenx.myauth.main.entity.Epay;
 import cn.daenx.myauth.main.entity.EpayOrders;
 import cn.daenx.myauth.main.mapper.EpayMapper;
 import cn.daenx.myauth.main.mapper.EpayOrdersMapper;
 import cn.daenx.myauth.main.service.IEpayOrdersService;
 import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.util.MyUtils;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -107,35 +103,6 @@ public class EpayOrdersServiceImpl extends ServiceImpl<EpayOrdersMapper, EpayOrd
         }
         int okCount = epayOrdersMapper.deleteBatchIds(strings);
         return Result.ok("成功删除 " + okCount + " 笔订单记录");
-    }
-
-    /**
-     * 异步查询订单
-     *
-     * @param outTradeNo
-     * @return
-     */
-    @Override
-    public Result queryOrder(String outTradeNo){
-        LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        List<Epay> eapyList = eapyMapper.selectList(epayLambdaQueryWrapper);
-        HashMap<String, Object> paramMap = new HashMap<>();
-        paramMap.put("act", "order");
-        paramMap.put("pid", eapyList.get(0).getPid());
-        paramMap.put("key", eapyList.get(0).getEkey());
-        paramMap.put("out_trade_no", outTradeNo);
-        String result = HttpUtil.get(MyUtils.removeDH(eapyList.get(0).getUrl()) + "/api.php", paramMap);
-        EpayOrders epayOrders = JSONUtil.toBean(result, EpayOrders.class);
-        if(CheckUtils.isObjectEmpty(epayOrders.getOutTradeNo())){
-            return Result.error("查询失败,订单为空");
-        }
-        LambdaQueryWrapper<EpayOrders> epayOrdersLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        epayOrdersLambdaQueryWrapper.eq(EpayOrders::getOutTradeNo,epayOrders.getOutTradeNo());
-        EpayOrders epayOrders1 = epayOrdersMapper.selectOne(epayOrdersLambdaQueryWrapper);
-        epayOrders.setFromAdminId(epayOrders1.getFromAdminId());
-        epayOrders.setId(epayOrders1.getId());
-        epayOrdersMapper.updateById(epayOrders);
-        return Result.ok("查询成功", epayOrders);
     }
 
 }

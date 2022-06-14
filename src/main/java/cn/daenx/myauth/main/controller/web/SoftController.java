@@ -64,7 +64,8 @@ public class SoftController {
         }
         if (CheckUtils.isObjectEmpty(soft.getName()) || CheckUtils.isObjectEmpty(soft.getStatus()) || CheckUtils.isObjectEmpty(soft.getType())
                 || CheckUtils.isObjectEmpty(soft.getGenKey()) || CheckUtils.isObjectEmpty(soft.getGenStatus()) || CheckUtils.isObjectEmpty(soft.getBindDeviceCode())
-                || CheckUtils.isObjectEmpty(soft.getHeartTime()) || CheckUtils.isObjectEmpty(soft.getRegister())) {
+                || CheckUtils.isObjectEmpty(soft.getHeartTime()) || CheckUtils.isObjectEmpty(soft.getRegister())
+                || CheckUtils.isObjectEmpty(soft.getSignTime())) {
             return Result.error("参数不全");
         }
         return softService.addSoft(soft);
@@ -93,7 +94,7 @@ public class SoftController {
         if (CheckUtils.isObjectEmpty(soft.getName()) && CheckUtils.isObjectEmpty(soft.getStatus())
                 && CheckUtils.isObjectEmpty(soft.getType()) && CheckUtils.isObjectEmpty(soft.getGenKey()) && CheckUtils.isObjectEmpty(soft.getGenStatus())
                 && CheckUtils.isObjectEmpty(soft.getBindDeviceCode()) && CheckUtils.isObjectEmpty(soft.getHeartTime())
-                && CheckUtils.isObjectEmpty(soft.getRegister())) {
+                && CheckUtils.isObjectEmpty(soft.getRegister()) && CheckUtils.isObjectEmpty(soft.getSignTime())) {
             return Result.error("参数不能全部为空");
         }
         return softService.updSoft(soft);

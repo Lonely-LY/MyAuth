@@ -36,11 +36,4 @@ public interface IEpayOrdersService extends IService<EpayOrders> {
      */
     Result delEpayOrders(String ids);
 
-    /**
-     * 异步查询订单
-     *
-     * @param outTradeNo
-     * @return
-     */
-    Result queryOrder(String outTradeNo);
 }

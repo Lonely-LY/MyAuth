@@ -282,17 +282,17 @@ public class MyInterceptor implements HandlerInterceptor {
                     response.getWriter().write(retStr);
                     return false;
                 }
-                Integer diffTime = Math.abs(timestamp - Integer.parseInt(MyUtils.getTimeStamp()));
-                if (diffTime > SoftEnums.DIFF_TIME.getCode()) {
-                    String retStr = Result.error("sign已过期").toJsonString();
-                    log.info("响应->" + retStr);
-                    response.getWriter().write(retStr);
-                    return false;
-                }
                 String skey = jsonObject.getString("skey");
                 Soft soft = (Soft) redisUtil.get("soft:" + skey);
                 if (CheckUtils.isObjectEmpty(soft)) {
                     String retStr = Result.error("skey错误").toJsonString();
+                    log.info("响应->" + retStr);
+                    response.getWriter().write(retStr);
+                    return false;
+                }
+                Integer diffTime = Math.abs(timestamp - Integer.parseInt(MyUtils.getTimeStamp()));
+                if (diffTime > soft.getSignTime()) {
+                    String retStr = Result.error("sign已过期").toJsonString();
                     log.info("响应->" + retStr);
                     response.getWriter().write(retStr);
                     return false;

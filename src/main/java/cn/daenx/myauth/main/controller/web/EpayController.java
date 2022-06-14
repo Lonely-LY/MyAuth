@@ -90,15 +90,14 @@ public class EpayController {
         JSONObject jsonObject = (JSONObject) request.getAttribute("json");
         BigDecimal money = jsonObject.getBigDecimal("money");
         Integer payId = jsonObject.getInteger("payId");
-        String payName = jsonObject.getString("payName");
-        String type = jsonObject.getString("type");
-        if (CheckUtils.isObjectEmpty(payId) && CheckUtils.isObjectEmpty(payName)){
+        String payDriver = jsonObject.getString("payDriver");
+        if (CheckUtils.isObjectEmpty(payId) && CheckUtils.isObjectEmpty(payDriver)){
             return Result.error("通道参数不能都为空");
         }
-        if(CheckUtils.isObjectEmpty(money) || CheckUtils.isObjectEmpty(type)){
+        if(CheckUtils.isObjectEmpty(money)){
             return Result.error("参数错误");
         }
-        return epayService.depositMoneyLink(payId,payName,money,type,admin);
+        return epayService.depositMoneyLink(payId,payDriver,money,admin);
     }
 
 

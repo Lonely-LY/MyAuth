@@ -228,6 +228,7 @@ public class SoftServiceImpl extends ServiceImpl<SoftMapper, Soft> implements IS
         LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(soft.getBindDeviceCode()), Soft::getBindDeviceCode, soft.getBindDeviceCode());
         LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(soft.getHeartTime()), Soft::getHeartTime, soft.getHeartTime());
         LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(soft.getRegister()), Soft::getRegister, soft.getRegister());
+        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(soft.getSignTime()), Soft::getSignTime, soft.getSignTime());
         return LambdaQueryWrapper;
     }
 

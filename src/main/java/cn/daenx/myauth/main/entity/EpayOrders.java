@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-@TableName("ma_epay_orders")
+@TableName("ma_pay_orders")
 public class EpayOrders extends Model {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
@@ -28,7 +28,7 @@ public class EpayOrders extends Model {
     private String outTradeNo;
 
     /**
-     * 支付类型(alipay:支付宝,tenpay:财付通,qqpay:QQ钱包,wxpay:微信支付)
+     * 支付类型(alipay:支付宝,qqpay:QQ钱包,wxpay:微信支付)
      */
     private String type;
 

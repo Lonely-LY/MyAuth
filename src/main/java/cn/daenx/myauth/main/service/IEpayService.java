@@ -38,13 +38,15 @@ public interface IEpayService extends IService<Epay> {
     Result getAllPayType();
 
     /**
-     * 充值金额
+     * 生成充值链接
      *
+     * @param payId
+     * @param payDriver
      * @param money
      * @param admin
      * @return
      */
-    Result depositMoneyLink(Integer payId,String payName,BigDecimal money , String type , Admin admin);
+    Result depositMoneyLink(Integer payId,String payDriver,BigDecimal money,Admin admin);
 
     /**
      * 处理epay异步通知

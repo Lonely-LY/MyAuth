@@ -27,9 +27,8 @@ public enum SoftEnums {
     TYPE_FREE(1,"免费"),
 
     REGISTER_DISABLE(0,"关闭注册"),
-    REGISTER_ABLE(1,"开启注册"),
+    REGISTER_ABLE(1,"开启注册");
 
-    DIFF_TIME(120,"允许时间戳误差");
     private Integer code;
     private String desc;
     private static final Map<Integer, String> codeMap;

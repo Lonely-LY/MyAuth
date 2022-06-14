@@ -160,37 +160,37 @@ CREATE TABLE `ma_data`  (
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for ma_epay_config
+-- Table structure for ma_pay_config
 -- ----------------------------
-DROP TABLE IF EXISTS `ma_epay_config`;
-CREATE TABLE `ma_epay_config`  (
+DROP TABLE IF EXISTS `ma_pay_config`;
+CREATE TABLE `ma_pay_config`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '通道名称',
-  `url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '易支付API地址',
-  `pid` int(11) NULL DEFAULT NULL COMMENT '商户ID',
-  `ekey` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户密匙',
-  `notify_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '异步通知地址(后端地址)',
-  `return_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付成功跳转地址',
-  `wxpay_switch` int(11) NULL DEFAULT 0 COMMENT '微信开关',
-  `alipay_switch` int(11) NULL DEFAULT 0 COMMENT '支付宝开关',
-  `qqpay_switch` int(11) NULL DEFAULT 0 COMMENT 'QQ支付开关',
+  `sort` int(11) NULL DEFAULT NULL COMMENT '排序，越小越前，从1开始',
+  `driver` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '通道标识符',
+  `config` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '通道配置',
+  `content` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '说明',
+  `update_time` int(10) NULL DEFAULT NULL COMMENT '修改时间戳',
+  `enabled` int(11) NULL DEFAULT 0 COMMENT '开关',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 2 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of ma_epay_config
+-- Records of ma_pay_config
 -- ----------------------------
-INSERT INTO `ma_epay_config` VALUES (1, '易支付', '', NULL, '', '', '', 0, 0, 0);
+INSERT INTO `ma_pay_config` VALUES (1, '微信', 1, 'epay_wxpay', '[{\"fieldName\":\"url\",\"fieldContent\":\"api地址\",\"fieldText\":\"\"},{\"fieldName\":\"pid\",\"fieldContent\":\"商户ID\",\"fieldText\":\"\"},{\"fieldName\":\"key\",\"fieldContent\":\"商户密匙\",\"fieldText\":\"\"},{\"fieldName\":\"notify_url\",\"fieldContent\":\"异步通知地址(后端地址)\",\"fieldText\":\"\"},{\"fieldName\":\"return_url\",\"fieldContent\":\"支付成功跳转地址\",\"fieldText\":\"\"}]', '易支付-微信', NULL, 0);
+INSERT INTO `ma_pay_config` VALUES (2, '支付宝', 2, 'epay_alipay', '[{\"fieldName\":\"url\",\"fieldContent\":\"api地址\",\"fieldText\":\"\"},{\"fieldName\":\"pid\",\"fieldContent\":\"商户ID\",\"fieldText\":\"\"},{\"fieldName\":\"key\",\"fieldContent\":\"商户密匙\",\"fieldText\":\"\"},{\"fieldName\":\"notify_url\",\"fieldContent\":\"异步通知地址(后端地址)\",\"fieldText\":\"\"},{\"fieldName\":\"return_url\",\"fieldContent\":\"支付成功跳转地址\",\"fieldText\":\"\"}]', '易支付-支付宝', NULL, 0);
+INSERT INTO `ma_pay_config` VALUES (3, 'QQ', 3, 'epay_qqpay', '[{\"fieldName\":\"url\",\"fieldContent\":\"api地址\",\"fieldText\":\"\"},{\"fieldName\":\"pid\",\"fieldContent\":\"商户ID\",\"fieldText\":\"\"},{\"fieldName\":\"key\",\"fieldContent\":\"商户密匙\",\"fieldText\":\"\"},{\"fieldName\":\"notify_url\",\"fieldContent\":\"异步通知地址(后端地址)\",\"fieldText\":\"\"},{\"fieldName\":\"return_url\",\"fieldContent\":\"支付成功跳转地址\",\"fieldText\":\"\"}]', '易支付-QQ', NULL, 0);
 
 -- ----------------------------
--- Table structure for ma_epay_orders
+-- Table structure for ma_pay_orders
 -- ----------------------------
-DROP TABLE IF EXISTS `ma_epay_orders`;
-CREATE TABLE `ma_epay_orders`  (
+DROP TABLE IF EXISTS `ma_pay_orders`;
+CREATE TABLE `ma_pay_orders`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `trade_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '易支付订单号',
   `out_trade_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户订单号',
-  `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付类型(alipay:支付宝,tenpay:财付通,qqpay:QQ钱包,wxpay:微信支付)',
+  `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付类型',
   `addtime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建订单时间',
   `endtime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '完成交易时间',
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商品名称',
@@ -201,7 +201,7 @@ CREATE TABLE `ma_epay_orders`  (
 ) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Records of ma_epay_orders
+-- Records of ma_pay_orders
 -- ----------------------------
 
 -- ----------------------------
@@ -316,8 +316,8 @@ INSERT INTO `ma_menu` VALUES ('d499258d-ea25-47e1-b580-ed98830df37f', 'd6321208-
 INSERT INTO `ma_menu` VALUES ('e4fa47b7-aa79-4708-9ce1-c7b686db6a50', NULL, 1, 2, 2, '/DataStatistics/List', '数据看板', 'radar-chart');
 INSERT INTO `ma_menu` VALUES ('ddff63b5-38db-4889-882d-fd9d9c4e583f', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 8, 2, '/SystemManage/StorageType/List', '额外存储类型', NULL);
 INSERT INTO `ma_menu` VALUES ('9b69d1b6-f0a6-48f9-9f25-cc121fda88aa', 'd6321208-4980-46e3-b3d4-ec057009472c', 2, 8, 2, '/DataMaintenance/Storage/List', '额外存储', NULL);
-INSERT INTO `ma_menu` VALUES ('1599a39b-38ce-4fca-9819-5fead2e63546', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 9, 2, '/SystemManage/EpayManage/index', '易支付配置', NULL);
-INSERT INTO `ma_menu` VALUES ('8dcc2036-3b90-4033-abdb-2d7a5636998e', 'd6321208-4980-46e3-b3d4-ec057009472c', 2, 9, 2, '/DataMaintenance/EpayOrdersManage/List', '订单管理', NULL);
+INSERT INTO `ma_menu` VALUES ('1599a39b-38ce-4fca-9819-5fead2e63546', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 9, 2, '/SystemManage/EpayManage/index', '支付通道管理', NULL);
+INSERT INTO `ma_menu` VALUES ('8dcc2036-3b90-4033-abdb-2d7a5636998e', 'd6321208-4980-46e3-b3d4-ec057009472c', 2, 9, 2, '/DataMaintenance/EpayOrdersManage/List', '支付订单管理', NULL);
 INSERT INTO `ma_menu` VALUES ('7ddb181b-3c6a-4a63-b45c-172ee8d7917b', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 10, 2, '/SystemManage/MailManage/List', '邮件通知管理', NULL);
 
 -- ----------------------------
@@ -414,6 +414,7 @@ CREATE TABLE `ma_soft`  (
   `gen_status` int(2) NULL DEFAULT 0 COMMENT '0=数据不加密，1=数据加密',
   `bind_device_code` int(2) NULL DEFAULT 0 COMMENT '0=不绑定机器码，1=绑定机器码',
   `heart_time` int(10) NULL DEFAULT 0 COMMENT '心跳有效时间',
+  `sign_time` int(10) NULL DEFAULT 30 COMMENT 'sign有效期(客户端与服务端的误差时间允许值)',
   `register` int(2) NULL DEFAULT 0 COMMENT '0=关闭注册，1=开启注册',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;

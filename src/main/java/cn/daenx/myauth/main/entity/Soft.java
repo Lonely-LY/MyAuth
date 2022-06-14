@@ -65,7 +65,9 @@ public class Soft extends Model {
      * 0=关闭注册，1=开启注册
      */
     private Integer register;
-
-
+    /**
+     * sign有效期(客户端与服务端的误差时间允许值)
+     */
+    private Integer signTime;
 
 }

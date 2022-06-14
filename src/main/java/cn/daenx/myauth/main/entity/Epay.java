@@ -10,12 +10,11 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-@TableName("ma_epay_config")
+@TableName("ma_pay_config")
 public class Epay extends Model {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-
 
     /**
      * 通道名称
@@ -23,43 +22,32 @@ public class Epay extends Model {
     private String name;
 
     /**
-     * 易支付接口地址
+     * 排序
      */
-    private String url;
+    private Integer sort;
 
     /**
-     * 商户ID
+     * 通道标识
      */
-    private Integer pid;
+    private String driver;
 
     /**
-     * 商户密匙
+     * 通道配置
      */
-    private String ekey;
+    private String config;
 
     /**
-     * 异步通知地址(后端地址)
+     * 通道说明
      */
-    private String notifyUrl;
+    private String content;
 
     /**
-     * 支付成功跳转地址
+     * 修改时间戳
      */
-    private String returnUrl;
+    private Integer updateTime;
 
     /**
-     * 微信支付开关(1开启0关闭)
+     * 通道开关
      */
-    private Integer wxpaySwitch;
-
-    /**
-     * 支付宝支付开关(1开启0关闭)
-     */
-    private Integer alipaySwitch;
-
-    /**
-     * QQ支付开关(1开启0关闭)
-     */
-    private Integer qqpaySwitch;
-
+    private Integer enabled;
 }

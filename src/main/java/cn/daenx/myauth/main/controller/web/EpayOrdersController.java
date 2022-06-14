@@ -87,22 +87,4 @@ public class EpayOrdersController {
         return epayOrdersService.delEpayOrders(ids);
     }
 
-    /**
-     * 异步查询订单
-     *
-     * @param request
-     * @return
-     */
-    @NoEncryptNoSign
-    @AdminLogin(is_super_role = false)
-    @PostMapping("queryOrder")
-    public Result queryOrder(HttpServletRequest request) {
-        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
-        String outTradeNo = jsonObject.getString("outTradeNo");
-        if(CheckUtils.isObjectEmpty(outTradeNo)){
-            return Result.error("商户订单号不能为空");
-        }
-        return epayOrdersService.queryOrder(outTradeNo);
-    }
-
 }
