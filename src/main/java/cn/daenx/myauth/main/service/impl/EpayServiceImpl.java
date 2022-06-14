@@ -154,13 +154,13 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
         String return_url = null;
         String key = null;
         String type = null;
-        if (payDriver.equals("epay_wxpay")){
+        if (epay.getDriver().equals("epay_wxpay")){
             type = "wxpay";
         }
-        if (payDriver.equals("epay_alipay")){
+        if (epay.getDriver().equals("epay_alipay")){
             type = "alipay";
         }
-        if (payDriver.equals("epay_qqpay")){
+        if (epay.getDriver().equals("epay_qqpay")){
             type = "qqpay";
         }
         for (PayConfig payConfig : payConfigs) {
@@ -308,7 +308,7 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
                 String result = HttpUtil.get(MyUtils.removeDH(url) + "/api.php", paramMap);
                 EpayOrders epayOrders1 = JSONUtil.toBean(result, EpayOrders.class);
                 if(CheckUtils.isObjectEmpty(epayOrders1) || epayOrders1.getStatus().equals(0)){
-                    return Result.error("订单接收通知成功,异步验证订单失败");
+                    return Result.error("订单接收通知成功,异步验证订单失败",result);
                 }
                 Admin admin = adminMapper.selectById(epayOrders.getFromAdminId());
                 BigDecimal oldMoney = new BigDecimal(admin.getMoney());
