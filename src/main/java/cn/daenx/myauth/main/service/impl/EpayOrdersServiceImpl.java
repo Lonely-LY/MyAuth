@@ -40,7 +40,7 @@ public class EpayOrdersServiceImpl extends ServiceImpl<EpayOrdersMapper, EpayOrd
         LambdaQueryWrapper<EpayOrders> LambdaQueryWrapper = new LambdaQueryWrapper<>();
         LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epayOrders.getTradeNo()), EpayOrders::getTradeNo, epayOrders.getTradeNo());
         LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epayOrders.getOutTradeNo()), EpayOrders::getOutTradeNo, epayOrders.getOutTradeNo());
-        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(epayOrders.getType()), EpayOrders::getType, epayOrders.getType());
+        LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epayOrders.getType()), EpayOrders::getType, epayOrders.getType());
         LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epayOrders.getAddtime()), EpayOrders::getAddtime, epayOrders.getAddtime());
         LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epayOrders.getEndtime()), EpayOrders::getEndtime, epayOrders.getEndtime());
         LambdaQueryWrapper.like(!CheckUtils.isObjectEmpty(epayOrders.getName()), EpayOrders::getName, epayOrders.getName());
