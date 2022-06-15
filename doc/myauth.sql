@@ -316,7 +316,7 @@ INSERT INTO `ma_menu` VALUES ('d499258d-ea25-47e1-b580-ed98830df37f', 'd6321208-
 INSERT INTO `ma_menu` VALUES ('e4fa47b7-aa79-4708-9ce1-c7b686db6a50', NULL, 1, 2, 2, '/DataStatistics/List', '数据看板', 'radar-chart');
 INSERT INTO `ma_menu` VALUES ('ddff63b5-38db-4889-882d-fd9d9c4e583f', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 8, 2, '/SystemManage/StorageType/List', '额外存储类型', NULL);
 INSERT INTO `ma_menu` VALUES ('9b69d1b6-f0a6-48f9-9f25-cc121fda88aa', 'd6321208-4980-46e3-b3d4-ec057009472c', 2, 8, 2, '/DataMaintenance/Storage/List', '额外存储', NULL);
-INSERT INTO `ma_menu` VALUES ('1599a39b-38ce-4fca-9819-5fead2e63546', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 9, 2, '/SystemManage/EpayManage/index', '支付通道管理', NULL);
+INSERT INTO `ma_menu` VALUES ('1599a39b-38ce-4fca-9819-5fead2e63546', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 9, 2, '/SystemManage/EpayManage/List', '支付通道管理', NULL);
 INSERT INTO `ma_menu` VALUES ('8dcc2036-3b90-4033-abdb-2d7a5636998e', 'd6321208-4980-46e3-b3d4-ec057009472c', 2, 9, 2, '/DataMaintenance/EpayOrdersManage/List', '支付订单管理', NULL);
 INSERT INTO `ma_menu` VALUES ('7ddb181b-3c6a-4a63-b45c-172ee8d7917b', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 10, 2, '/SystemManage/MailManage/List', '邮件通知管理', NULL);
 
