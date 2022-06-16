@@ -1,21 +1,21 @@
 # MyAuth
 
 ### 介绍
+    基于原项目进行二开的，原项目地址已在以下贴出
+
     一个简单的授权管理系统，使用了springboot、mybatis-plus、redis、mysql等。
     此仓库为后端代码
 
 ![logo](https://images.gitee.com/uploads/images/2022/0218/215303_dbbda392_5370510.png)
 
-* 我的QQ：[1330166564](https://wpa.qq.com/msgrd?v=3&uin=1330166564&site=qq&menu=yes)
+* 我的QQ：[1935613](https://wpa.qq.com/msgrd?v=3&uin=1935613&site=qq&menu=yes)
 * 官方Q群：[1016357430](https://jq.qq.com/?_wv=1027&k=eaectWIr)
 ### 原项目分支
-- [@Daen](https://gitee.com/daenmax/myauth)
+- [@Daen](https://gitee.com/daenmax)
   项目地址 https://gitee.com/daenmax/myauth
 ### 前端
 - [@TianYe](https://gitee.com/fieldtianye)
-项目地址 https://gitee.com/fieldtianye/my-auth-web
-- [@施瑞贤](https://gitee.com/shiruixian)
-项目地址 https://gitee.com/shiruixian/my-auth-vue
+项目地址 https://gitee.com/fieldtianye/my-auth-web/tree/feature/Lonely
 
 ### 预览
 
@@ -45,16 +45,15 @@ https://www.cnblogs.com/daen/p/16019664.html
 ![IDEA打包教程](https://images.gitee.com/uploads/images/2022/0311/191225_bdb8cfee_5370510.png)
 
 ### 部署教程
-[MyAuth 后端 宝塔面板部署教程](https://www.cnblogs.com/daen/p/15997872.html)
+[MyAuth 后端 宝塔面板部署教程](https://www.nunui.cn/archives/49.html)
 <br>
-[MyAuth 前端 宝塔面板部署教程](https://www.cnblogs.com/daen/p/16015813.html)
+[MyAuth 前端 宝塔面板部署教程](https://www.nunui.cn/archives/50.html)
 
 ### 各语言DEMO
 见doc/demo/目录
 
 ### API文档
-原项目地址：[https://www.apifox.cn/apidoc/project-646981/](https://www.apifox.cn/apidoc/project-646981/) <br>
-本项目地址：[https://www.apifox.cn/apidoc/shared-f5728933-86e8-4767-a255-926500e3e31a](https://www.apifox.cn/apidoc/shared-f5728933-86e8-4767-a255-926500e3e31a)
+项目地址：[https://www.apifox.cn/apidoc/shared-f5728933-86e8-4767-a255-926500e3e31a](https://www.apifox.cn/apidoc/shared-f5728933-86e8-4767-a255-926500e3e31a)
 
 ###  功能清单
 

@@ -188,7 +188,7 @@ INSERT INTO `ma_pay_config` VALUES (3, 'QQ(易支付)', 3, 'epay_qqpay', '[{\"fi
 DROP TABLE IF EXISTS `ma_pay_orders`;
 CREATE TABLE `ma_pay_orders`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `trade_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '易支付订单号',
+  `trade_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付订单号',
   `out_trade_no` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '商户订单号',
   `type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '支付类型',
   `addtime` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '创建订单时间',
