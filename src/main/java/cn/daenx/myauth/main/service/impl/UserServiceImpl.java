@@ -823,6 +823,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userLambdaQueryWrapper.eq(User::getFromSoftId,softC.getId());
         User userC = userMapper.selectOne(userLambdaQueryWrapper);
         userA.setId(userC.getId());
+        if (CheckUtils.isObjectEmpty(userA.getCkey())){
+            userA.setCkey(userC.getCkey());
+        }
+        if (CheckUtils.isObjectEmpty(userA.getPass())){
+            userA.setPass(userC.getPass());
+        }
         int num = userMapper.updateById(userA);
         if (num == 0) {
             return Result.error("解绑失败");
