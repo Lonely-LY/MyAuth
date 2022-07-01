@@ -15,7 +15,7 @@
   项目地址 https://gitee.com/daenmax/myauth
 ### 前端
 - [@TianYe](https://gitee.com/fieldtianye)
-项目地址 https://gitee.com/fieldtianye/my-auth-web/tree/feature/Lonely
+项目地址 https://gitee.com/fieldtianye/my-auth-web
 
 ### 预览
 
