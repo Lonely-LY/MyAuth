@@ -45,9 +45,9 @@ https://www.cnblogs.com/daen/p/16019664.html
 ![IDEA打包教程](https://images.gitee.com/uploads/images/2022/0311/191225_bdb8cfee_5370510.png)
 
 ### 部署教程
-[MyAuth 后端 宝塔面板部署教程](https://www.nunui.cn/archives/49.html)
+[MyAuth 后端 宝塔面板部署教程](https://www.nunui.cn/49.html)
 <br>
-[MyAuth 前端 宝塔面板部署教程](https://www.nunui.cn/archives/50.html)
+[MyAuth 前端 宝塔面板部署教程](https://www.nunui.cn/50.html)
 
 ### 各语言DEMO
 见doc/demo/目录
