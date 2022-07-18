@@ -79,6 +79,24 @@ CREATE TABLE `ma_alog`  (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for ma_operation_log
+-- ----------------------------
+DROP TABLE IF EXISTS `ma_operation_log`;
+CREATE TABLE `ma_operation_log`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `operation_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `operation_ua` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `operation_ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `operation_time` int(10) NULL DEFAULT NULL,
+  `operation_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of ma_operation_log
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for ma_ban
 -- ----------------------------
 DROP TABLE IF EXISTS `ma_ban`;
@@ -319,6 +337,7 @@ INSERT INTO `ma_menu` VALUES ('9b69d1b6-f0a6-48f9-9f25-cc121fda88aa', 'd6321208-
 INSERT INTO `ma_menu` VALUES ('1599a39b-38ce-4fca-9819-5fead2e63546', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 9, 2, '/SystemManage/EpayManage/List', '支付通道管理', NULL);
 INSERT INTO `ma_menu` VALUES ('8dcc2036-3b90-4033-abdb-2d7a5636998e', 'd6321208-4980-46e3-b3d4-ec057009472c', 2, 9, 2, '/DataMaintenance/EpayOrdersManage/List', '支付订单管理', NULL);
 INSERT INTO `ma_menu` VALUES ('7ddb181b-3c6a-4a63-b45c-172ee8d7917b', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 10, 2, '/SystemManage/MailManage/List', '邮件通知管理', NULL);
+INSERT INTO `ma_menu` VALUES ('f9a80e4a-d473-40f9-847b-74916815c7b7', '43767678-01c5-4b54-bfac-e108b6ceb32a', 2, 3, 2, '/SystemManage/OperationLogManage/List', '操作日志', NULL);
 
 -- ----------------------------
 -- Table structure for ma_msg
@@ -395,7 +414,7 @@ CREATE TABLE `ma_role`  (
 -- ----------------------------
 -- Records of ma_role
 -- ----------------------------
-INSERT INTO `ma_role` VALUES (1, '超级管理员', 0, '[\"59664367-11eb-489e-867d-af6c66129d03\",\"e4fa47b7-aa79-4708-9ce1-c7b686db6a50\",\"e50cadbc-8b2b-4c8f-a262-9da95d3371bb\",\"94beb8ae-a606-4dea-bfa8-57bc734818bf\",\"bcb68a35-eb0f-4696-acd8-3c76897e0f0f\",\"b89eb2d8-40e4-4698-ab5a-ddaed7846ee1\",\"e70b3176-a2fa-4fc5-90f3-5abd9e2d13b8\",\"1d3838df-bc61-42e1-a149-dcc2705e2894\",\"5b35fe6a-da5f-46d5-b1ed-076308a38a13\",\"a59b674e-8d45-46c2-be6e-ff44d2ee7b86\",\"dbe9effe-0dc8-4378-a64c-5bf904ac6fae\",\"d499258d-ea25-47e1-b580-ed98830df37f\",\"9b69d1b6-f0a6-48f9-9f25-cc121fda88aa\",\"8dcc2036-3b90-4033-abdb-2d7a5636998e\",\"d7720078-3b65-4f83-b404-c117e5c46b68\",\"9d953050-f354-4e9f-9f15-b91ea6a666f0\",\"71eedb8d-ae9e-4958-a351-c8dfb4711f21\",\"546ea73a-1d46-41f5-bfa6-e646b3e741ae\",\"d58b4547-e20f-4eb9-b7d5-b3195ed5cc18\",\"014bf6d7-cff3-4b61-aa3b-f59cc0dd3235\",\"d27462d2-b316-4983-9066-f283fcf17e46\",\"ddff63b5-38db-4889-882d-fd9d9c4e583f\",\"1599a39b-38ce-4fca-9819-5fead2e63546\",\"7ddb181b-3c6a-4a63-b45c-172ee8d7917b\",\"922666ba-1ed1-4b6b-9043-30aeead1eebe\",\"23a8778f-9424-449a-a68e-54b12e4c30f3\",\"cd256048-3f8e-4fb7-ada3-55d538ce7611\",\"30633357-dd12-415e-8631-660e2aa6b9ad\",\"d6321208-4980-46e3-b3d4-ec057009472c\",\"43767678-01c5-4b54-bfac-e108b6ceb32a\",\"da3af6df-cd00-4746-b788-bd2dfeab716f\"]', 100);
+INSERT INTO `ma_role` VALUES (1, '超级管理员', 0, '[\"59664367-11eb-489e-867d-af6c66129d03\",\"e70b3176-a2fa-4fc5-90f3-5abd9e2d13b8\",\"b89eb2d8-40e4-4698-ab5a-ddaed7846ee1\",\"1d3838df-bc61-42e1-a149-dcc2705e2894\",\"5b35fe6a-da5f-46d5-b1ed-076308a38a13\",\"a59b674e-8d45-46c2-be6e-ff44d2ee7b86\",\"dbe9effe-0dc8-4378-a64c-5bf904ac6fae\",\"d499258d-ea25-47e1-b580-ed98830df37f\",\"9b69d1b6-f0a6-48f9-9f25-cc121fda88aa\",\"8dcc2036-3b90-4033-abdb-2d7a5636998e\",\"e50cadbc-8b2b-4c8f-a262-9da95d3371bb\",\"94beb8ae-a606-4dea-bfa8-57bc734818bf\",\"bcb68a35-eb0f-4696-acd8-3c76897e0f0f\",\"922666ba-1ed1-4b6b-9043-30aeead1eebe\",\"23a8778f-9424-449a-a68e-54b12e4c30f3\",\"cd256048-3f8e-4fb7-ada3-55d538ce7611\",\"d7720078-3b65-4f83-b404-c117e5c46b68\",\"546ea73a-1d46-41f5-bfa6-e646b3e741ae\",\"d27462d2-b316-4983-9066-f283fcf17e46\",\"d58b4547-e20f-4eb9-b7d5-b3195ed5cc18\",\"014bf6d7-cff3-4b61-aa3b-f59cc0dd3235\",\"71eedb8d-ae9e-4958-a351-c8dfb4711f21\",\"9d953050-f354-4e9f-9f15-b91ea6a666f0\",\"ddff63b5-38db-4889-882d-fd9d9c4e583f\",\"1599a39b-38ce-4fca-9819-5fead2e63546\",\"7ddb181b-3c6a-4a63-b45c-172ee8d7917b\",\"f9a80e4a-d473-40f9-847b-74916815c7b7\",\"e4fa47b7-aa79-4708-9ce1-c7b686db6a50\",\"d6321208-4980-46e3-b3d4-ec057009472c\",\"30633357-dd12-415e-8631-660e2aa6b9ad\",\"da3af6df-cd00-4746-b788-bd2dfeab716f\",\"43767678-01c5-4b54-bfac-e108b6ceb32a\"]', 100);
 INSERT INTO `ma_role` VALUES (2, '授权商', 1, '[\"59664367-11eb-489e-867d-af6c66129d03\",\"922666ba-1ed1-4b6b-9043-30aeead1eebe\",\"23a8778f-9424-449a-a68e-54b12e4c30f3\",\"cd256048-3f8e-4fb7-ada3-55d538ce7611\",\"da3af6df-cd00-4746-b788-bd2dfeab716f\"]', 80);
 INSERT INTO `ma_role` VALUES (3, '代理商', 1, '[\"59664367-11eb-489e-867d-af6c66129d03\",\"922666ba-1ed1-4b6b-9043-30aeead1eebe\",\"23a8778f-9424-449a-a68e-54b12e4c30f3\",\"cd256048-3f8e-4fb7-ada3-55d538ce7611\",\"da3af6df-cd00-4746-b788-bd2dfeab716f\"]', 70);
 

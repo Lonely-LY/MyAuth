@@ -19,9 +19,11 @@ public interface IAdminService extends IService<Admin> {
      *
      * @param user
      * @param pass
+     * @param ip
+     * @param ua
      * @return
      */
-    Result login(String user, String pass, String ip);
+    Result login(String user, String pass, String ip ,String ua);
 
     /**
      * 修改密码

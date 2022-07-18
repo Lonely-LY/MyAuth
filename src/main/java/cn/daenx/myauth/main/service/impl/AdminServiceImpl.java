@@ -4,6 +4,7 @@ import cn.daenx.myauth.main.entity.Admin;
 import cn.daenx.myauth.main.entity.Alog;
 import cn.daenx.myauth.main.entity.Role;
 import cn.daenx.myauth.main.entity.Soft;
+import cn.daenx.myauth.main.mapper.OperationLogMapper;
 import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.util.MyUtils;
 import cn.daenx.myauth.util.RedisUtil;
@@ -39,6 +40,8 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
     @Resource
     private AdminMapper adminMapper;
     @Resource
+    private OperationLogMapper operationLogMapper;
+    @Resource
     private AlogMapper alogMapper;
     @Resource
     private RedisUtil redisUtil;
@@ -51,7 +54,7 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
      * @return
      */
     @Override
-    public Result login(String user, String pass, String ip) {
+    public Result login(String user, String pass, String ip, String ua) {
         LambdaQueryWrapper<Admin> adminLambdaQueryWrapper = new LambdaQueryWrapper<>();
         adminLambdaQueryWrapper.eq(Admin::getUser, user);
         Admin admin = adminMapper.selectOne(adminLambdaQueryWrapper);
@@ -85,6 +88,13 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
                 jsonObject.put("fromSoftName", obj.getName());
             }
         }
+        OperationLog operationLog = new OperationLog();
+        operationLog.setOperationIp(admin.getLastIp());
+        operationLog.setOperationUa(ua);
+        operationLog.setOperationTime(admin.getLastTime());
+        operationLog.setOperationType("登录后台");
+        operationLog.setOperationUser(admin.getUser());
+        operationLogMapper.insert(operationLog);
         return Result.ok("登录成功", jsonObject);
     }
 

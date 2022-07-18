@@ -47,7 +47,8 @@ public class AdminController {
             return Result.error("参数错误");
         }
         String ip = IpUtil.getIpAddr(request);
-        return adminService.login(user, pass, ip);
+        String ua = request.getHeader("User-Agent");
+        return adminService.login(user, pass, ip, ua);
     }
 
     /**
