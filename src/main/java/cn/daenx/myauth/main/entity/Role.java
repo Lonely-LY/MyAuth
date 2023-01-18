@@ -36,7 +36,7 @@ public class Role extends baseEntity {
     /**
      * 0=超级管理员
      */
-    private Integer fromSoftId;
+    private String fromSoftId;
 
     /**
      * 只存menu的id，json数组

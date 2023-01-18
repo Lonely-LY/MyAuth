@@ -22,10 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -325,6 +322,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
         }
 
+        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userC.getUser() + "*");
+        
+        if (softC.getMaxOnlineCount().equals(1) && scan.size() == 1){
+            for (String s : scan) {
+                redisUtil.del(s);
+            }
+        }
+        
+        if (softC.getMaxOnlineCount() > 1 && scan.size() >= softC.getMaxOnlineCount()){
+            return Result.error("此账号设备在线数已满，请离线某处后再重新登录");
+        }
         userA.setFromVerId(userC.getFromVerId());
         userA.setFromVerKey(userC.getFromVerKey());
         userA.setLastIp(userC.getLastIp());
@@ -354,7 +362,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 userA.setToken(token);
                 int num = userMapper.updateById(userA);
                 if (num > 0) {
-                    redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser(), userA, softC.getHeartTime());
+                    redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser() + ":" + token, userA, softC.getHeartTime());
                     jsonObject.put("user", userA.getUser());
                     jsonObject.put("name", userA.getName());
                     jsonObject.put("qq", userA.getQq());
@@ -395,7 +403,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 userA.setToken(token);
                 int num = userMapper.updateById(userA);
                 if (num > 0) {
-                    redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser(), userA, softC.getHeartTime());
+                    redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser() + ":" + token, userA, softC.getHeartTime());
                     jsonObject.put("user", userA.getUser());
                     jsonObject.put("name", userA.getName());
                     jsonObject.put("qq", userA.getQq());
@@ -436,7 +444,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     userA.setToken(token);
                     int num = userMapper.updateById(userA);
                     if (num > 0) {
-                        redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser(), userA, softC.getHeartTime());
+                        redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser() + ":" + token, userA, softC.getHeartTime());
                         jsonObject.put("user", userA.getUser());
                         jsonObject.put("name", userA.getName());
                         jsonObject.put("qq", userA.getQq());
@@ -483,7 +491,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     userA.setToken(token);
                     int num = userMapper.updateById(userA);
                     if (num > 0) {
-                        redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser(), userA, softC.getHeartTime());
+                        redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser() + ":" + token, userA, softC.getHeartTime());
                         jsonObject.put("user", userA.getUser());
                         jsonObject.put("name", userA.getName());
                         jsonObject.put("qq", userA.getQq());
@@ -513,7 +521,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @return
      */
     @Override
-    public Result heart(User userA, Soft softC) {
+    public Result heart(User userA, Soft softC, String token) {
         if (softC.getType().equals(SoftEnums.TYPE_FREE.getCode())) {
             //免费模式
         } else {
@@ -563,7 +571,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 }
             }
         }
-        redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser(), userA, softC.getHeartTime());
+        redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser() + ":" + token, userA, softC.getHeartTime());
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userA.getUser());
         jsonObject.put("name", userA.getName());
@@ -576,6 +584,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return Result.ok("心跳成功", jsonObject);
     }
 
+    /**
+     * 离线
+     *
+     * @param user
+     * @param softC
+     * @param token
+     * @return
+     */
+    @Override
+    public Result offLine(User user, Soft softC, String token) {
+        User userA = (User) redisUtil.get("user:" + softC.getId() + ":" + user.getUser() + ":" + token);
+        if (CheckUtils.isObjectEmpty(userA)){
+            return Result.error("离线失败，未找到此设备在线");
+        }
+        redisUtil.del("user:" + softC.getId() + ":" + user.getUser() + ":" + token);
+        JSONObject jsonObject = new JSONObject(true);
+        return Result.ok("离线成功", jsonObject);
+    }
 
     /**
      * 使用卡密
@@ -672,17 +698,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         plog.setAddTime(Integer.parseInt(MyUtils.getTimeStamp()));
         plog.setFromSoftId(card.getFromSoftId());
         plog.setRemark(card.getCkey());
-        User userR = (User) redisUtil.get("user:" + softC.getId() + ":" + userC.getUser());
-        if (!CheckUtils.isObjectEmpty(userR)) {
-            userA.setLastTime(userR.getLastTime());
-        }
+//        User userR = (User) redisUtil.get("user:" + softC.getId() + ":" + userC.getUser());
+//        if (!CheckUtils.isObjectEmpty(userR)) {
+//            userA.setLastTime(userR.getLastTime());
+//        }
         userA.setFromAdminId(card.getFromAdminId());
         userA.setCkey(card.getCkey());
         int num = userMapper.updateById(userA);
         if (num > 0) {
-            if (!CheckUtils.isObjectEmpty(userR)) {
-                redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser(), userA, softC.getHeartTime());
-            }
+//            if (!CheckUtils.isObjectEmpty(userR)) {
+//                redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser(), userA, softC.getHeartTime());
+//            }
             plogMapper.insert(plog);
             card.setLetUser(userA.getUser());
             card.setLetTime(Integer.valueOf(MyUtils.getTimeStamp()));
@@ -840,7 +866,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userA.getUser());
-        redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
+        //redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
+        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userA.getUser() + "*");
+        for (String s : scan) {
+            redisUtil.del(s.toString());
+        }
         if(mailSend.getSendSwitch().equals(1)){
             if(!CheckUtils.isObjectEmpty(userC.getQq())){
                 try {
@@ -929,7 +959,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userA.getUser());
-        redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
+        //redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
+        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userA.getUser() + "*");
+        for (String s : scan) {
+            redisUtil.del(s.toString());
+        }
         if(mailSend.getSendSwitch().equals(1)){
             if(!CheckUtils.isObjectEmpty(userA.getQq())){
                 try {
@@ -971,8 +1005,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      * @return
      */
     @Override
-    public Result editInfo(User user, Soft soft) {
-        User userR = (User) redisUtil.get("user:" + soft.getId() + ":" + user.getUser());
+    public Result editInfo(User user, Soft soft, String token) {
+        User userR = (User) redisUtil.get("user:" + soft.getId() + ":" + user.getUser() + ":" + token);
         userR.setName(user.getName());
         userR.setQq(user.getQq());
         int num = userMapper.updateById(userR);
@@ -984,7 +1018,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "editInfo");
         MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
 
-        redisUtil.set("user:" + soft.getId() + ":" + user.getUser(), userR, soft.getHeartTime());
+        redisUtil.set("user:" + soft.getId() + ":" + user.getUser() + ":" + token, userR, soft.getHeartTime());
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userR.getUser());
         jsonObject.put("name", userR.getName());
@@ -1053,9 +1087,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 Version obj2 = (Version) redisUtil.get("id:version:" + msgPage.getRecords().get(i).getFromVerId());
                 msgPage.getRecords().get(i).setFromVerName(obj2.getVer());
             }
-            User onlineUser = (User) redisUtil.get("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser());
-            if (!CheckUtils.isObjectEmpty(onlineUser)){
-                msgPage.getRecords().get(i).setOnlineType(1);
+            //User onlineUser = (User) redisUtil.get("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser());
+            Set<String> scan = redisUtil.scan("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser() + "*");
+
+            if (scan.size() > 0){
+                msgPage.getRecords().get(i).setOnlineType(scan.size());
             }else {
                 msgPage.getRecords().get(i).setOnlineType(0);
             }
@@ -1124,7 +1160,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "updUser");
         MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
 
-        redisUtil.del("user:" + oldUser.getFromSoftId() + ":" + oldUser.getUser());
+        //redisUtil.del("user:" + oldUser.getFromSoftId() + ":" + oldUser.getUser());
+        Set<String> scan = redisUtil.scan("user:" + oldUser.getFromSoftId() + ":" + oldUser.getUser() + "*");
+        for (String s : scan) {
+            redisUtil.del(s.toString());
+        }
+
         if(mailSend.getSendSwitch().equals(1)){
             if(!CheckUtils.isObjectEmpty(user.getQq())){
                 try {
@@ -1242,7 +1283,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             if (!CheckUtils.isObjectEmpty(user)) {
                 int num = userMapper.deleteById(user.getId());
                 if (num > 0) {
-                    redisUtil.del("user:" + user.getFromSoftId() + ":" + user.getUser());
+                    //redisUtil.del("user:" + user.getFromSoftId() + ":" + user.getUser());
+                    Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + "*");
+                    for (String s : scan) {
+                        redisUtil.del(s.toString());
+                    }
                 }
                 okCount = okCount + num;
             }
@@ -1260,11 +1305,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Result getMyUserList(User user, MyPage myPage, Admin admin) {
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
-        if (role.getFromSoftId() == 0) {
+        if (role.getFromSoftId().equals("0")) {
             return Result.error("超级管理员无法使用此接口");
         }
         user.setFromAdminId(admin.getId());
-        user.setFromSoftId(role.getFromSoftId());
+        //user.setFromSoftId(Integer.parseInt(role.getFromSoftId()));
         Page<User> page = new Page<>(myPage.getPageIndex(), myPage.getPageSize(), true);
         if (!CheckUtils.isObjectEmpty(myPage.getOrders())) {
             for (int i = 0; i < myPage.getOrders().size(); i++) {
@@ -1282,9 +1327,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 Version obj2 = (Version) redisUtil.get("id:version:" + msgPage.getRecords().get(i).getFromVerId());
                 msgPage.getRecords().get(i).setFromVerName(obj2.getVer());
             }
-            User onlineUser = (User) redisUtil.get("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser());
-            if (!CheckUtils.isObjectEmpty(onlineUser)){
-                msgPage.getRecords().get(i).setOnlineType(1);
+            //User onlineUser = (User) redisUtil.get("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser());
+            Set<String> scan = redisUtil.scan("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser() + "*");
+
+            if (scan.size() > 0){
+                msgPage.getRecords().get(i).setOnlineType(scan.size());
             }else {
                 msgPage.getRecords().get(i).setOnlineType(0);
             }
@@ -1384,7 +1431,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             selectOne.setUser(newUser);
             int num = userMapper.updateById(selectOne);
             if (num > 0) {
-                redisUtil.del("user:" + softId + ":" + user);
+                //redisUtil.del("user:" + softId + ":" + user);
+                Set<String> scan = redisUtil.scan("user:" + softId + ":" + user + "*");
+                for (String s : scan) {
+                    redisUtil.del(s.toString());
+                }
 
                 if(mailSend.getSendSwitch().equals(1)){
                     if(!CheckUtils.isObjectEmpty(selectOne.getQq())){
@@ -1431,7 +1482,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             selectOne.setUser(newUser);
             int num = userMapper.updateById(selectOne);
             if (num > 0) {
-                redisUtil.del("user:" + softId + ":" + user);
+                //redisUtil.del("user:" + softId + ":" + user);
+                Set<String> scan = redisUtil.scan("user:" + softId + ":" + user + "*");
+                for (String s : scan) {
+                    redisUtil.del(s.toString());
+                }
 
                 if(mailSend.getSendSwitch().equals(1)){
                     if(!CheckUtils.isObjectEmpty(selectOne.getQq())){
@@ -1528,8 +1583,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return Result.error("账号不存在");
         }
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
-        if (!role.getFromSoftId().equals(soft.getId())) {
-            return Result.error("此账号不属于此软件");
+//        if (!soft.getId().equals(Integer.parseInt(role.getFromSoftId()))) {
+//            return Result.error("此账号不属于此软件");
+//        }
+        if(!role.getFromSoftId().equals("0")){
+            String[] fromSoftIdArr = role.getFromSoftId().split(",");
+            for (int j = 0; j < fromSoftIdArr.length; j++) {
+                if (fromSoftIdArr[j].equals(soft.getId().toString())){
+                    break;
+                }
+                if(j == fromSoftIdArr.length - 1){
+                    return Result.error("此账号不属于此软件");
+                }
+            }
         }
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", admin.getUser());

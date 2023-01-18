@@ -221,7 +221,7 @@ public class AcardController {
             return;
         }
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
-        if (role.getFromSoftId() != 0) {
+        if (!role.getFromSoftId().equals("0")) {
             return;
         }
         Acard acard = new Acard();

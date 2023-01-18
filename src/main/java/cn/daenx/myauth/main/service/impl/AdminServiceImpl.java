@@ -211,9 +211,23 @@ public class AdminServiceImpl extends ServiceImpl<AdminMapper, Admin> implements
             Role role = (Role) redisUtil.get("role:" + msgPage.getRecords().get(i).getRole());
             if (!CheckUtils.isObjectEmpty(role)) {
                 msgPage.getRecords().get(i).setRoleName(role.getName());
-                if(role.getFromSoftId() != 0){
-                    Soft obj = (Soft) redisUtil.get("id:soft:" + role.getFromSoftId());
-                    msgPage.getRecords().get(i).setFromSoftName(obj.getName());
+                if(!role.getFromSoftId().equals("0")){
+                    //Soft obj = (Soft) redisUtil.get("id:soft:" + role.getFromSoftId());
+                    //msgPage.getRecords().get(i).setFromSoftName(obj.getName());
+                    String[] fromSoftIdArr = role.getFromSoftId().split(",");
+                    StringBuilder fromSoftName = new StringBuilder();
+                    for (int j = 0; j < fromSoftIdArr.length; j++) {
+                        Soft obj = (Soft) redisUtil.get("id:soft:" + fromSoftIdArr[j]);
+                        if (j < fromSoftIdArr.length - 1){
+                            fromSoftName.append(obj.getName());
+                            fromSoftName.append(",");
+                        }else{
+                            fromSoftName.append(obj.getName());
+                        }
+                    }
+                    msgPage.getRecords().get(i).setFromSoftName(fromSoftName.toString());
+                }else{
+                    msgPage.getRecords().get(i).setFromSoftName("超级管理员");
                 }
             }
         }

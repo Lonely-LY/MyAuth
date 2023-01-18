@@ -3,7 +3,7 @@ package cn.daenx.myauth.base.annotation;
 import java.lang.annotation.*;
 
 /**
- * 软件校验，主要校验skey是否正确、软件是否停用、是否维护
+ * 用户封禁校验，主要校验机器码，IP，用户是否被封禁
  * @author DaenMax
  */
 //定义可以在方法和类上使用此注解

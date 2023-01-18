@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 
 /**
  * <p>
@@ -56,7 +57,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
      * @return
      */
     @Override
-    public Result letEvent(String name, User user, Soft soft) {
+    public Result letEvent(String name, User user, Soft soft, String token) {
         Plog plog = new Plog();
         LambdaQueryWrapper<Event> eventLambdaQueryWrapper = new LambdaQueryWrapper<>();
         eventLambdaQueryWrapper.eq(Event::getName, name);
@@ -103,7 +104,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         plog.setFromSoftId(event.getFromSoftId());
         int num = userMapper.updateById(user);
         if (num > 0) {
-            redisUtil.set("user:" + user.getFromSoftId() + ":" + user.getUser(), user, soft.getHeartTime());
+            redisUtil.set("user:" + user.getFromSoftId() + ":" + user.getUser() + ":" + token, user, soft.getHeartTime());
             plogMapper.insert(plog);
             JSONObject jsonObject = new JSONObject(true);
             jsonObject.put("user", user.getUser());

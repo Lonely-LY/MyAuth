@@ -191,8 +191,32 @@ public class SoftApiController {
         JSONObject jsonObject = (JSONObject) request.getAttribute("json");
         Soft soft = (Soft) request.getAttribute("obj_soft");
         User user = (User) request.getAttribute("obj_user");
+        String token = jsonObject.getJSONObject("data").getString("token");
         user.setLastTime(Integer.valueOf(MyUtils.getTimeStamp()));
-        return userService.heart(user, soft);
+        return userService.heart(user, soft, token);
+    }
+
+    /**
+     * 离线
+     *
+     * @param request
+     * @return
+     */
+    @SoftValidated
+    @VersionValidated
+    @DataDecrypt
+    @SignValidated
+    @UserLogin
+    @BanValidated(is_ip = true, is_device_code = true, is_user = false)
+    @PostMapping("offLine")
+    public Result offLine(HttpServletRequest request) {
+        //不管有没有加密和解密，取提交的JSON都要通过下面这行去取
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+        Soft soft = (Soft) request.getAttribute("obj_soft");
+        User user = (User) request.getAttribute("obj_user");
+        String token = jsonObject.getJSONObject("data").getString("token");
+        user.setLastTime(Integer.valueOf(MyUtils.getTimeStamp()));
+        return userService.offLine(user, soft, token);
     }
 
     /**
@@ -339,10 +363,11 @@ public class SoftApiController {
         Soft soft = (Soft) request.getAttribute("obj_soft");
         User user = (User) request.getAttribute("obj_user");
         String name = jsonObject.getJSONObject("data").getString("name");
+        String token = jsonObject.getJSONObject("data").getString("token");
         if (CheckUtils.isObjectEmpty(name)) {
             return Result.error("事件name不能为空");
         }
-        return eventService.letEvent(name, user, soft);
+        return eventService.letEvent(name, user, soft, token);
     }
 
     /**
@@ -417,6 +442,7 @@ public class SoftApiController {
         User user = (User) request.getAttribute("obj_user");
         String newName = jsonObject.getJSONObject("data").getString("newName");
         String newQq = jsonObject.getJSONObject("data").getString("newQq");
+        String token = jsonObject.getJSONObject("data").getString("token");
         if (CheckUtils.isObjectEmpty(newName) && CheckUtils.isObjectEmpty(newQq)) {
             return Result.error("新昵称和新QQ不能都为空");
         }
@@ -426,7 +452,7 @@ public class SoftApiController {
         if (!CheckUtils.isObjectEmpty(newQq)) {
             user.setQq(newQq);
         }
-        return userService.editInfo(user, soft);
+        return userService.editInfo(user, soft, token);
     }
 
     /**

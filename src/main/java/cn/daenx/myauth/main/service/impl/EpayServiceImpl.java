@@ -132,7 +132,7 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
     @Override
     public Result depositMoneyLink(Integer payId , String payDriver , BigDecimal money , Admin admin) {
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
-        if (role.getFromSoftId() == 0) {
+        if (role.getFromSoftId().equals("0")) {
             return Result.error("超级管理员无法使用此接口");
         }
         LambdaQueryWrapper<Epay> epayLambdaQueryWrapper = new LambdaQueryWrapper<>();

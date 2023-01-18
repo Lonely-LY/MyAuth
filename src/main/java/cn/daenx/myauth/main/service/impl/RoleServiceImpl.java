@@ -83,9 +83,23 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
             JSONArray jsonArray = JSONArray.parseArray(msgPage.getRecords().get(i).getMeunIds());
             List<String> list = (List<String>) JSONArray.toJavaObject(jsonArray, List.class);
             msgPage.getRecords().get(i).setMeunList(list);
-            if (!CheckUtils.isObjectEmpty(msgPage.getRecords().get(i).getFromSoftId()) && !msgPage.getRecords().get(i).getFromSoftId().equals(0)) {
-                Soft obj = (Soft) redisUtil.get("id:soft:" + msgPage.getRecords().get(i).getFromSoftId());
-                msgPage.getRecords().get(i).setFromSoftName(obj.getName());
+            if (!CheckUtils.isObjectEmpty(msgPage.getRecords().get(i).getFromSoftId()) && !msgPage.getRecords().get(i).getFromSoftId().equals("0")) {
+                //Soft obj = (Soft) redisUtil.get("id:soft:" + msgPage.getRecords().get(i).getFromSoftId());
+                //msgPage.getRecords().get(i).setFromSoftName(obj.getName());
+                String[] fromSoftIdArr = msgPage.getRecords().get(i).getFromSoftId().split(",");
+                StringBuilder fromSoftName = new StringBuilder();
+                for (int j = 0; j < fromSoftIdArr.length; j++) {
+                    Soft obj = (Soft) redisUtil.get("id:soft:" + fromSoftIdArr[j]);
+                    if (j < fromSoftIdArr.length - 1){
+                        fromSoftName.append(obj.getName());
+                        fromSoftName.append(",");
+                    }else{
+                        fromSoftName.append(obj.getName());
+                    }
+                }
+                msgPage.getRecords().get(i).setFromSoftName(fromSoftName.toString());
+            }else if(msgPage.getRecords().get(i).getFromSoftId().equals("0")){
+                msgPage.getRecords().get(i).setFromSoftName("超级管理员");
             }
         }
         return Result.ok("获取成功", msgPage);
@@ -101,7 +115,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
     public Result getRoleListEx(Role role) {
         LambdaQueryWrapper<Role> roleLambdaQueryWrapper = new LambdaQueryWrapper<>();
         if (!CheckUtils.isObjectEmpty(role.getFromSoftId())) {
-            roleLambdaQueryWrapper.eq(Role::getFromSoftId, role.getFromSoftId());
+            roleLambdaQueryWrapper.like(Role::getFromSoftId, role.getFromSoftId());
         }
         roleLambdaQueryWrapper.select(Role::getId, Role::getName);
         if (!CheckUtils.isObjectEmpty(role.getName())) {
@@ -138,9 +152,23 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
         }
         newRole.setMeunList(menuList);
 
-        if (!CheckUtils.isObjectEmpty(newRole.getFromSoftId()) && !newRole.getFromSoftId().equals(0)) {
-            Soft obj = (Soft) redisUtil.get("id:soft:" + newRole.getFromSoftId());
-            newRole.setFromSoftName(obj.getName());
+        if (!CheckUtils.isObjectEmpty(newRole.getFromSoftId()) && !newRole.getFromSoftId().equals("0")) {
+            //Soft obj = (Soft) redisUtil.get("id:soft:" + newRole.getFromSoftId());
+            //newRole.setFromSoftName(obj.getName());
+            String[] fromSoftIdArr = newRole.getFromSoftId().split(",");
+            StringBuilder fromSoftName = new StringBuilder();
+            for (int j = 0; j < fromSoftIdArr.length; j++) {
+                Soft obj = (Soft) redisUtil.get("id:soft:" + fromSoftIdArr[j]);
+                if (j < fromSoftIdArr.length - 1){
+                    fromSoftName.append(obj.getName());
+                    fromSoftName.append(",");
+                }else{
+                    fromSoftName.append(obj.getName());
+                }
+            }
+            newRole.setFromSoftName(fromSoftName.toString());
+        }else if(newRole.getFromSoftId().equals("0")){
+            newRole.setFromSoftName("超级管理员");
         }
         return Result.ok("查询成功", newRole);
     }
@@ -233,7 +261,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements IR
      */
     @Override
     public Result addRole(Role role) {
-        if(!role.getFromSoftId().equals(0)){
+        if(!role.getFromSoftId().equals("0")){
             Soft soft = softMapper.selectById(role.getFromSoftId());
             if (CheckUtils.isObjectEmpty(soft)) {
                 return Result.error("fromSoftId错误");

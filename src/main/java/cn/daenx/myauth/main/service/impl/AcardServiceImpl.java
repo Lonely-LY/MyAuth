@@ -272,7 +272,7 @@ public class AcardServiceImpl extends ServiceImpl<AcardMapper, Acard> implements
     @Override
     public Result letACard(String ckey, Admin adminC) {
         Role role = (Role) redisUtil.get("role:" + adminC.getRole());
-        if (role.getFromSoftId() == 0) {
+        if (role.getFromSoftId().equals("0")) {
             return Result.error("超级管理员无法使用此接口");
         }
         LambdaQueryWrapper<Acard> acardLambdaQueryWrapper = new LambdaQueryWrapper<>();

@@ -1,5 +1,7 @@
 package cn.daenx.myauth.main.controller.web;
 
+import cn.daenx.myauth.main.entity.Admin;
+import cn.daenx.myauth.main.entity.Role;
 import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.base.annotation.AdminLogin;
 import cn.daenx.myauth.base.annotation.NoEncryptNoSign;
@@ -7,6 +9,7 @@ import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.main.entity.Soft;
 import cn.daenx.myauth.main.service.ISoftService;
+import cn.daenx.myauth.util.RedisUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 public class SoftController {
     @Resource
     private ISoftService softService;
+    @Resource
+    private RedisUtil redisUtil;
 
     /**
      * 获取软件列表
@@ -155,5 +160,18 @@ public class SoftController {
         JSONObject jsonObject = (JSONObject) request.getAttribute("json");
         Soft soft = jsonObject.toJavaObject(Soft.class);
         return softService.getSoftListEx(soft);
+    }
+
+    @NoEncryptNoSign
+    @AdminLogin(is_super_role = false)
+    @PostMapping("getMySoftListEx")
+    public Result getMySoftListEx(HttpServletRequest request){
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+        Admin admin = (Admin) request.getAttribute("obj_admin");
+        Role role = (Role) redisUtil.get("role:" + admin.getRole());
+        if (role.getFromSoftId().equals("0")) {
+            return Result.error("超级管理员无法使用此接口");
+        }
+        return softService.getMySoftListEx(admin);
     }
 }

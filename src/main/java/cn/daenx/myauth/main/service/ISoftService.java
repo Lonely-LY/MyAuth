@@ -2,6 +2,7 @@ package cn.daenx.myauth.main.service;
 
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.base.vo.MyPage;
+import cn.daenx.myauth.main.entity.Admin;
 import cn.daenx.myauth.main.entity.Soft;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -69,4 +70,11 @@ public interface ISoftService extends IService<Soft> {
      * @return
      */
     Result getSoftListSimple(String name);
+
+    /**
+     * 获取我的软件列表_简要
+     * @param admin
+     * @return
+     */
+    Result getMySoftListEx(Admin admin);
 }

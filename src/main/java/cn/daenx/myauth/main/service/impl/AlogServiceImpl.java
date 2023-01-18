@@ -111,7 +111,7 @@ public class AlogServiceImpl extends ServiceImpl<AlogMapper, Alog> implements IA
     @Override
     public Result getMyAlogList(Alog alog, MyPage myPage, Admin admin) {
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
-        if (role.getFromSoftId() == 0) {
+        if (role.getFromSoftId().equals("0")) {
             return Result.error("超级管理员无法使用此接口");
         }
         alog.setAdminId(admin.getId());

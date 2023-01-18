@@ -45,7 +45,7 @@ public class ConfigController {
             return Result.error("参数错误");
         }
         if (CheckUtils.isObjectEmpty(config.getSeoTitle()) && CheckUtils.isObjectEmpty(config.getSeoKeywords()) && CheckUtils.isObjectEmpty(config.getSeoDescription())
-                && CheckUtils.isObjectEmpty(config.getDingbotAccessToken()) && CheckUtils.isObjectEmpty(config.getDingbotMsg()) && CheckUtils.isObjectEmpty(config.getOpenApiKey())) {
+                && CheckUtils.isObjectEmpty(config.getOpenApiKey())) {
             return Result.error("参数不能全部为空");
         }
         return configService.editConfig(config);

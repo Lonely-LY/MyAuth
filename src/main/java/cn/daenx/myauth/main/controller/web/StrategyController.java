@@ -79,10 +79,10 @@ public class StrategyController {
         }
         Admin admin = (Admin) request.getAttribute("obj_admin");
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
-        if (role.getFromSoftId() == 0) {
+        if (role.getFromSoftId().equals("0")) {
             return Result.error("超级管理员无法使用此接口");
         }
-        strategy.setFromSoftId(role.getFromSoftId());
+        //strategy.setFromSoftId(Integer.parseInt(role.getFromSoftId()));
         if (CheckUtils.isObjectEmpty(strategy.getType())) {
             return Result.error("type参数不能为空");
         }

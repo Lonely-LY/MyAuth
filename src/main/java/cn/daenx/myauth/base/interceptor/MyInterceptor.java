@@ -102,7 +102,7 @@ public class MyInterceptor implements HandlerInterceptor {
                 boolean is_super_role = methodAnnotation.is_super_role();
                 if(is_super_role){
                     Role role = (Role) redisUtil.get("role:" + admin.getRole());
-                    if(role.getFromSoftId() != 0){
+                    if(!role.getFromSoftId().equals("0")){
                         log.info("接收->" + jsonObject.toJSONString());
                         String retStr = Result.error(500, "你没有权限[1001]").toJsonString();
                         log.info("响应->" + retStr);
@@ -249,7 +249,7 @@ public class MyInterceptor implements HandlerInterceptor {
                     response.getWriter().write(retStr);
                     return false;
                 }
-                User user = (User) redisUtil.get("user:" + soft.getId() + ":" + jsonObject1.getString("user"));
+                User user = (User) redisUtil.get("user:" + soft.getId() + ":" + jsonObject1.getString("user") + ":" + token);
                 if (CheckUtils.isObjectEmpty(user)) {
                     log.info("接收->" + jsonObject.toJSONString());
                     String retStr = Result.error("用户未登录").toJsonString();
@@ -257,12 +257,14 @@ public class MyInterceptor implements HandlerInterceptor {
                     response.getWriter().write(retStr);
                     return false;
                 }
-                if (!user.getToken().equals(token)) {
-                    log.info("接收->" + jsonObject.toJSONString());
-                    String retStr = Result.error("账号可能异地登录，请重新登录").toJsonString();
-                    log.info("响应->" + retStr);
-                    response.getWriter().write(retStr);
-                    return false;
+                if(soft.getMaxOnlineCount().equals(1)){
+                    if (!user.getToken().equals(token)) {
+                        log.info("接收->" + jsonObject.toJSONString());
+                        String retStr = Result.error("账号可能异地登录，请重新登录").toJsonString();
+                        log.info("响应->" + retStr);
+                        response.getWriter().write(retStr);
+                        return false;
+                    }
                 }
                 request.setAttribute("obj_user", user);
             }

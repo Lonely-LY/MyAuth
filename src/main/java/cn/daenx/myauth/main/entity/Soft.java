@@ -69,5 +69,9 @@ public class Soft extends Model {
      * sign有效期(客户端与服务端的误差时间允许值)
      */
     private Integer signTime;
+    /**
+     * 同账号最大在线数(0为不限制)
+     */
+    private Integer maxOnlineCount;
 
 }

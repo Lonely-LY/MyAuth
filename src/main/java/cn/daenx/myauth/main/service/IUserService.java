@@ -52,7 +52,17 @@ public interface IUserService extends IService<User> {
      * @param softC
      * @return
      */
-    Result heart(User user, Soft softC);
+    Result heart(User user, Soft softC, String token);
+
+    /**
+     * 离线
+     *
+     * @param user
+     * @param softC
+     * @param token
+     * @return
+     */
+    Result offLine(User user, Soft softC, String token);
 
     /**
      * 使用卡密
@@ -99,7 +109,7 @@ public interface IUserService extends IService<User> {
      * @param soft
      * @return
      */
-    Result editInfo(User user, Soft soft);
+    Result editInfo(User user, Soft soft, String token);
 
     /**
      * 获取用户列表

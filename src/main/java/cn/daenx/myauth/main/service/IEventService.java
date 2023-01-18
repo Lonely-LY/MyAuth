@@ -24,7 +24,7 @@ public interface IEventService extends IService<Event> {
      * @param soft
      * @return
      */
-    Result letEvent(String name, User user, Soft soft);
+    Result letEvent(String name, User user, Soft soft, String token);
 
     /**
      * 获取事件列表

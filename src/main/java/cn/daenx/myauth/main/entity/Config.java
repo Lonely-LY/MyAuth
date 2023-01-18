@@ -35,16 +35,6 @@ public class Config extends Model {
     private String seoDescription;
 
     /**
-     * 钉钉机器人
-     */
-    private String dingbotAccessToken;
-
-    /**
-     * 0=关闭通知，1=开启通知
-     */
-    private Integer dingbotMsg;
-
-    /**
      * 开放接口key
      */
     private String openApiKey;

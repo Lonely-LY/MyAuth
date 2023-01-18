@@ -283,11 +283,11 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements IC
     @Override
     public Result getMyCardList(Card card, MyPage myPage, Admin admin) {
         Role role = (Role) redisUtil.get("role:" + admin.getRole());
-        if (role.getFromSoftId() == 0) {
+        if (role.getFromSoftId().equals("0")) {
             return Result.error("超级管理员无法使用此接口");
         }
         card.setFromAdminId(admin.getId());
-        card.setFromSoftId(role.getFromSoftId());
+        //card.setFromSoftId(Integer.parseInt(role.getFromSoftId()));
         Page<Card> page = new Page<>(myPage.getPageIndex(), myPage.getPageSize(), true);
         if (!CheckUtils.isObjectEmpty(myPage.getOrders())) {
             for (int i = 0; i < myPage.getOrders().size(); i++) {
@@ -338,7 +338,7 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements IC
     @Override
     public Result addMyCard(Integer strategyId, String prefix, Integer count, Admin adminC) {
         Role role = (Role) redisUtil.get("role:" + adminC.getRole());
-        if (role.getFromSoftId() == 0) {
+        if (role.getFromSoftId().equals("0")) {
             return Result.error("超级管理员无法使用此接口");
         }
         Strategy strategy = strategyMapper.selectById(strategyId);
@@ -348,8 +348,19 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements IC
         if (!strategy.getStatus().equals(1)) {
             return Result.error("策略已被禁用");
         }
-        if (!strategy.getFromSoftId().equals(role.getFromSoftId())) {
-            return Result.error("非法行为：跨软件使用策略");
+//        if (!strategy.getFromSoftId().equals(Integer.parseInt(role.getFromSoftId()))) {
+//            return Result.error("非法行为：跨软件使用策略");
+//        }
+        if(!role.getFromSoftId().equals("0")){
+            String[] fromSoftIdArr = role.getFromSoftId().split(",");
+            for (int j = 0; j < fromSoftIdArr.length; j++) {
+                if (fromSoftIdArr[j].equals(strategy.getFromSoftId().toString())){
+                    break;
+                }
+                if(j == fromSoftIdArr.length - 1){
+                    return Result.error("非法行为：跨权限使用策略");
+                }
+            }
         }
         BigDecimal price = new BigDecimal(strategy.getPrice());
         BigDecimal allPrice = price.multiply(new BigDecimal(count)).multiply(BigDecimal.valueOf(role.getDiscount())).divide(BigDecimal.valueOf(100));

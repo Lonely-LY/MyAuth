@@ -84,7 +84,7 @@ spring:
       # 连接池中的最小空闲连接
       min-idle:
 
-  # 邮件服务器配置
+  # 邮件服务器配置（方式1）
   mail:
     # 邮件服务地址
     host: smtp.qq.com
@@ -104,6 +104,28 @@ spring:
             class: javax.net.ssl.SSLSocketFactory
             # 端口
             port: 465
+
+  # 邮件服务器配置（方式2）
+#  mail:
+#    # 邮件服务地址
+#    host: smtp.qq.com
+#    # 用户名
+#    username: xxxxxx@xxx.com
+#    # 密码
+#    password: xxxxxxxx
+#    # 发件昵称
+#    nickname: MyAuth授权中心
+#    # 端口
+#    port: 25
+#    # 编码格式
+#    default-encoding: UTF-8
+#    properties:
+#      mail:
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#            required: true
 
 # 加密token的秘钥，长度必须为16位，仅支持英文和数字，不支持特殊符号和中文，不能以0开始，否则会BOOM，因为YML会把0开头的数字作为8进制对待，注入时转化为十进制注入
 genKey: 1234567890123456

@@ -88,7 +88,7 @@ public class InitConfig implements ApplicationRunner {
         if (roleCount == 0) {
             Role role = new Role();
             role.setId(1);
-            role.setFromSoftId(0);
+            role.setFromSoftId("0");
             role.setName("超级管理员");
             role.setDiscount(100);
             roleService.save(role);

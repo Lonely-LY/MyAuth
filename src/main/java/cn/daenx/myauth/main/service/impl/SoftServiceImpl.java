@@ -6,8 +6,6 @@ import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.util.MyUtils;
 import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.base.vo.Result;
-import cn.daenx.myauth.main.entity.*;
-import cn.daenx.myauth.main.mapper.*;
 import cn.daenx.myauth.main.service.ISoftService;
 import cn.daenx.myauth.util.RedisUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -17,8 +15,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>
@@ -146,7 +143,11 @@ public class SoftServiceImpl extends ServiceImpl<SoftMapper, Soft> implements IS
         userLambdaQueryWrapper.eq(User::getFromSoftId, soft.getId());
         List<User> userList = userMapper.selectList(userLambdaQueryWrapper);
         for (User user : userList) {
-            redisUtil.del("user:" + user.getFromSoftId() + ":" + user.getUser());
+            //redisUtil.del("user:" + user.getFromSoftId() + ":" + user.getUser());
+            Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + "*");
+            for (String s : scan) {
+                redisUtil.del(s.toString());
+            }
         }
         userMapper.delete(userLambdaQueryWrapper);
         //删除事件表
@@ -264,5 +265,27 @@ public class SoftServiceImpl extends ServiceImpl<SoftMapper, Soft> implements IS
         }
         List<Map<String, Object>> maps = softMapper.selectMaps(softLambdaQueryWrapper);
         return Result.ok("获取成功", maps);
+    }
+
+    /**
+     * 获取我的软件列表_简要
+     * @param admin
+     * @return
+     */
+    @Override
+    public Result getMySoftListEx(Admin admin) {
+        LambdaQueryWrapper<Soft> mySoftLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        mySoftLambdaQueryWrapper.select(Soft::getId,Soft::getName);
+        Role role = (Role) redisUtil.get("role:" + admin.getRole());
+        String[] fromSoftIdArr = role.getFromSoftId().split(",");
+        Collection<Object> list = new ArrayList<>();
+        for (String s : fromSoftIdArr) {
+            Soft obj = (Soft) redisUtil.get("id:soft:" + s);
+            Map<String,Object> map = new HashMap<>();
+            map.put("id", s);
+            map.put("name", obj.getName());
+            list.add(map);
+        }
+        return Result.ok("获取成功", list);
     }
 }
