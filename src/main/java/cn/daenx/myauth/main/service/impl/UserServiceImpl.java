@@ -322,17 +322,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
         }
 
-        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userC.getUser() + ":*");
-        
-        if (softC.getMaxOnlineCount().equals(1) && scan.size() == 1){
-            for (String s : scan) {
-                redisUtil.del(s);
-            }
-        }
-        
-        if (softC.getMaxOnlineCount() > 1 && scan.size() >= softC.getMaxOnlineCount()){
-            return Result.error("此账号设备在线数已满，请离线某处后再重新登录");
-        }
         userA.setFromVerId(userC.getFromVerId());
         userA.setFromVerKey(userC.getFromVerKey());
         userA.setLastIp(userC.getLastIp());
@@ -358,6 +347,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     userA.setDeviceCode(userC.getDeviceCode());
                     userA.setDeviceInfo(userC.getDeviceInfo());
                 }
+
+                Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userC.getUser() + ":*");
+                if (softC.getMaxOnlineCount() > 1 && scan.size() >= softC.getMaxOnlineCount()){
+                    return Result.error("此账号设备在线数已满，请离线某处后再重新登录");
+                }
+                if (softC.getMaxOnlineCount().equals(1) && scan.size() == 1){
+                    for (String s : scan) {
+                        redisUtil.del(s);
+                    }
+                }
+
                 String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), String.valueOf(softC.getId()), genKey);
                 userA.setToken(token);
                 int num = userMapper.updateById(userA);
@@ -399,6 +399,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     userA.setDeviceCode(userC.getDeviceCode());
                     userA.setDeviceInfo(userC.getDeviceInfo());
                 }
+
+                Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userC.getUser() + ":*");
+                if (softC.getMaxOnlineCount() > 1 && scan.size() >= softC.getMaxOnlineCount()){
+                    return Result.error("此账号设备在线数已满，请离线某处后再重新登录");
+                }
+                if (softC.getMaxOnlineCount().equals(1) && scan.size() == 1){
+                    for (String s : scan) {
+                        redisUtil.del(s);
+                    }
+                }
+
                 String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), String.valueOf(softC.getId()), genKey);
                 userA.setToken(token);
                 int num = userMapper.updateById(userA);
@@ -440,6 +451,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         userA.setDeviceCode(userC.getDeviceCode());
                         userA.setDeviceInfo(userC.getDeviceInfo());
                     }
+
+                    Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userC.getUser() + ":*");
+                    if (softC.getMaxOnlineCount() > 1 && scan.size() >= softC.getMaxOnlineCount()){
+                        return Result.error("此账号设备在线数已满，请离线某处后再重新登录");
+                    }
+                    if (softC.getMaxOnlineCount().equals(1) && scan.size() == 1){
+                        for (String s : scan) {
+                            redisUtil.del(s);
+                        }
+                    }
+
                     String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), String.valueOf(softC.getId()), genKey);
                     userA.setToken(token);
                     int num = userMapper.updateById(userA);
@@ -487,6 +509,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         userA.setDeviceCode(userC.getDeviceCode());
                         userA.setDeviceInfo(userC.getDeviceInfo());
                     }
+
+                    Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userC.getUser() + ":*");
+                    if (softC.getMaxOnlineCount() > 1 && scan.size() >= softC.getMaxOnlineCount()){
+                        return Result.error("此账号设备在线数已满，请离线某处后再重新登录");
+                    }
+                    if (softC.getMaxOnlineCount().equals(1) && scan.size() == 1){
+                        for (String s : scan) {
+                            redisUtil.del(s);
+                        }
+                    }
+
                     String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), String.valueOf(softC.getId()), genKey);
                     userA.setToken(token);
                     int num = userMapper.updateById(userA);
