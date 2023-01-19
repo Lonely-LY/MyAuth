@@ -322,7 +322,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             }
         }
 
-        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userC.getUser() + "*");
+        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userC.getUser() + ":*");
         
         if (softC.getMaxOnlineCount().equals(1) && scan.size() == 1){
             for (String s : scan) {
@@ -867,7 +867,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userA.getUser());
         //redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
-        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userA.getUser() + "*");
+        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userA.getUser() + ":*");
         for (String s : scan) {
             redisUtil.del(s.toString());
         }
@@ -960,7 +960,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userA.getUser());
         //redisUtil.del("user:" + softC.getId() + ":" + userA.getUser());
-        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userA.getUser() + "*");
+        Set<String> scan = redisUtil.scan("user:" + softC.getId() + ":" + userA.getUser() + ":*");
         for (String s : scan) {
             redisUtil.del(s.toString());
         }
@@ -1088,7 +1088,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 msgPage.getRecords().get(i).setFromVerName(obj2.getVer());
             }
             //User onlineUser = (User) redisUtil.get("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser());
-            Set<String> scan = redisUtil.scan("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser() + "*");
+            Set<String> scan = redisUtil.scan("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser() + ":*");
 
             if (scan.size() > 0){
                 msgPage.getRecords().get(i).setOnlineType(scan.size());
@@ -1161,7 +1161,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
 
         //redisUtil.del("user:" + oldUser.getFromSoftId() + ":" + oldUser.getUser());
-        Set<String> scan = redisUtil.scan("user:" + oldUser.getFromSoftId() + ":" + oldUser.getUser() + "*");
+        Set<String> scan = redisUtil.scan("user:" + oldUser.getFromSoftId() + ":" + oldUser.getUser() + ":*");
         for (String s : scan) {
             redisUtil.del(s.toString());
         }
@@ -1284,7 +1284,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 int num = userMapper.deleteById(user.getId());
                 if (num > 0) {
                     //redisUtil.del("user:" + user.getFromSoftId() + ":" + user.getUser());
-                    Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + "*");
+                    Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + ":*");
                     for (String s : scan) {
                         redisUtil.del(s.toString());
                     }
@@ -1328,7 +1328,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 msgPage.getRecords().get(i).setFromVerName(obj2.getVer());
             }
             //User onlineUser = (User) redisUtil.get("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser());
-            Set<String> scan = redisUtil.scan("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser() + "*");
+            Set<String> scan = redisUtil.scan("user:" + msgPage.getRecords().get(i).getFromSoftId() + ":" + msgPage.getRecords().get(i).getUser() + ":*");
 
             if (scan.size() > 0){
                 msgPage.getRecords().get(i).setOnlineType(scan.size());
@@ -1432,7 +1432,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             int num = userMapper.updateById(selectOne);
             if (num > 0) {
                 //redisUtil.del("user:" + softId + ":" + user);
-                Set<String> scan = redisUtil.scan("user:" + softId + ":" + user + "*");
+                Set<String> scan = redisUtil.scan("user:" + softId + ":" + user + ":*");
                 for (String s : scan) {
                     redisUtil.del(s.toString());
                 }
@@ -1483,7 +1483,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             int num = userMapper.updateById(selectOne);
             if (num > 0) {
                 //redisUtil.del("user:" + softId + ":" + user);
-                Set<String> scan = redisUtil.scan("user:" + softId + ":" + user + "*");
+                Set<String> scan = redisUtil.scan("user:" + softId + ":" + user + ":*");
                 for (String s : scan) {
                     redisUtil.del(s.toString());
                 }

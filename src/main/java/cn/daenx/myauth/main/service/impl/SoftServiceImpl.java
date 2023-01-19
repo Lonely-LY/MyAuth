@@ -144,7 +144,7 @@ public class SoftServiceImpl extends ServiceImpl<SoftMapper, Soft> implements IS
         List<User> userList = userMapper.selectList(userLambdaQueryWrapper);
         for (User user : userList) {
             //redisUtil.del("user:" + user.getFromSoftId() + ":" + user.getUser());
-            Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + "*");
+            Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + ":*");
             for (String s : scan) {
                 redisUtil.del(s.toString());
             }
