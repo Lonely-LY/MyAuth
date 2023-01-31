@@ -104,7 +104,13 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         plog.setFromSoftId(event.getFromSoftId());
         int num = userMapper.updateById(user);
         if (num > 0) {
-            redisUtil.set("user:" + user.getFromSoftId() + ":" + user.getUser() + ":" + token, user, soft.getHeartTime());
+            //redisUtil.set("user:" + user.getFromSoftId() + ":" + user.getUser() + ":" + token, user, soft.getHeartTime());
+            Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + ":*");
+            if(scan.size() > 0){
+                for (String s : scan) {
+                    redisUtil.set(s, user, soft.getHeartTime());
+                }
+            }
             plogMapper.insert(plog);
             JSONObject jsonObject = new JSONObject(true);
             jsonObject.put("user", user.getUser());

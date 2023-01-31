@@ -735,6 +735,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //        if (!CheckUtils.isObjectEmpty(userR)) {
 //            userA.setLastTime(userR.getLastTime());
 //        }
+        Set<String> scan = redisUtil.scan("user:" + userA.getFromSoftId() + ":" + userA.getUser() + ":*");
         userA.setFromAdminId(card.getFromAdminId());
         userA.setCkey(card.getCkey());
         int num = userMapper.updateById(userA);
@@ -742,6 +743,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //            if (!CheckUtils.isObjectEmpty(userR)) {
 //                redisUtil.set("user:" + userA.getFromSoftId() + ":" + userA.getUser(), userA, softC.getHeartTime());
 //            }
+            if(scan.size() > 0){
+                for (String s : scan) {
+                    redisUtil.set(s, userA, softC.getHeartTime());
+                }
+            }
             plogMapper.insert(plog);
             card.setLetUser(userA.getUser());
             card.setLetTime(Integer.valueOf(MyUtils.getTimeStamp()));
@@ -1050,8 +1056,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LambdaQueryWrapper<MailSend> mailSendLambdaQueryWrapper = new LambdaQueryWrapper<>();
         mailSendLambdaQueryWrapper.eq(MailSend::getSendType, "editInfo");
         MailSend mailSend = mailSendMapper.selectOne(mailSendLambdaQueryWrapper);
-
-        redisUtil.set("user:" + soft.getId() + ":" + user.getUser() + ":" + token, userR, soft.getHeartTime());
+        //redisUtil.set("user:" + soft.getId() + ":" + user.getUser() + ":" + token, userR, soft.getHeartTime());
+        Set<String> scan = redisUtil.scan("user:" + soft.getId() + ":" + user.getUser() + ":*");
+        if(scan.size() > 0){
+            for (String s : scan) {
+                redisUtil.set(s, userR, soft.getHeartTime());
+            }
+        }
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userR.getUser());
         jsonObject.put("name", userR.getName());
