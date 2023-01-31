@@ -300,30 +300,29 @@ public class EpayServiceImpl extends ServiceImpl<EpayMapper, Epay> implements IE
             //转为MD5
             signStr = DigestUtils.md5DigestAsHex(signStr.getBytes());
             if (signStr.equals(sign) && sign_type.equals("MD5")){
-                HashMap<String, Object> paramMap = new HashMap<>();
-                paramMap.put("act", "order");
-                paramMap.put("pid", ePid);
-                paramMap.put("key", key);
-                paramMap.put("out_trade_no", out_trade_no);
-                String result = HttpUtil.get(MyUtils.removeDH(url) + "/api.php", paramMap);
-                EpayOrders epayOrders1 = JSONUtil.toBean(result, EpayOrders.class);
-                if(CheckUtils.isObjectEmpty(epayOrders1) || epayOrders1.getStatus().equals(0)){
-                    return Result.error("订单接收通知成功,异步验证订单失败",result);
-                }
+//                HashMap<String, Object> paramMap = new HashMap<>();
+//                paramMap.put("act", "order");
+//                paramMap.put("pid", ePid);
+//                paramMap.put("key", key);
+//                paramMap.put("out_trade_no", out_trade_no);
+//                String result = HttpUtil.get(MyUtils.removeDH(url) + "/api.php", paramMap);
+//                EpayOrders epayOrders1 = JSONUtil.toBean(result, EpayOrders.class);
+//                if(CheckUtils.isObjectEmpty(epayOrders1) || epayOrders1.getStatus().equals(0)){
+//                    return Result.error("订单接收通知成功,异步验证订单失败",result);
+//                }
                 Admin admin = adminMapper.selectById(epayOrders.getFromAdminId());
                 BigDecimal oldMoney = new BigDecimal(admin.getMoney());
-                BigDecimal addMoney = new BigDecimal(epayOrders1.getMoney());
+                BigDecimal addMoney = new BigDecimal(money);
                 String nowMoney = String.valueOf(oldMoney.add(addMoney));
                 admin.setMoney(nowMoney);
-                epayOrders.setStatus(epayOrders1.getStatus());
-                epayOrders.setAddtime(epayOrders1.getAddtime());
-                epayOrders.setEndtime(epayOrders1.getEndtime());
-                epayOrders.setTradeNo(epayOrders1.getTradeNo());
+                epayOrders.setStatus(1);
+                epayOrders.setEndtime(MyUtils.dateToStr(MyUtils.stamp2Date(MyUtils.getTimeStamp())));
+                epayOrders.setTradeNo(trade_no);
                 Alog alog = new Alog();
-                alog.setMoney(epayOrders1.getMoney());
+                alog.setMoney(money);
                 alog.setAfterMoney(nowMoney);
                 alog.setAdminId(admin.getId());
-                alog.setData("后台充值：" + "支付方式" + epay.getDriver() + ",充值金额" + epayOrders1.getMoney());
+                alog.setData("后台充值：" + "支付方式" + epay.getDriver() + ",充值金额" + money);
                 alog.setType("后台充值");
                 alog.setAddTime(Integer.valueOf(MyUtils.getTimeStamp()));
                 epayOrdersMapper.updateById(epayOrders);

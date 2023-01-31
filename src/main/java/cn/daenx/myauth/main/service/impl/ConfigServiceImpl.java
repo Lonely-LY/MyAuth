@@ -62,6 +62,8 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
         jsonObject.put("title", config.getSeoTitle());
         jsonObject.put("keywords", config.getSeoKeywords());
         jsonObject.put("description", config.getSeoDescription());
+        jsonObject.put("JDKVersion", System.getProperty("java.version"));
+        jsonObject.put("MyAuthVersion", CheckUtils.isObjectEmpty(this.getClass().getPackage().getImplementationVersion())?"dev":this.getClass().getPackage().getImplementationVersion());
         return Result.ok("获取成功", jsonObject);
     }
 

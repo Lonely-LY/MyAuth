@@ -7,5 +7,5 @@
          |___/
 
      |————————————————————————|
-官方网站：https://gitee.com/daenmax/myauth
+   官方网站：https://www.myauthx.cn/
      |————————————————————————|

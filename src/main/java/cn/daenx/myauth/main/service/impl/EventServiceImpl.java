@@ -76,7 +76,7 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
             } else {
                 Integer af = user.getPoint() + event.getPoint();
                 if (af < 0) {
-                    return Result.error("点数不足，至少需要" + event.getPoint() + "点");
+                    return Result.error("点数不足，至少需要" + -event.getPoint() + "点");
                 } else {
                     user.setPoint(af);
                 }

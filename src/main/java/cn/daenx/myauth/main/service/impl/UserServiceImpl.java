@@ -715,16 +715,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         userA.setAuthTime(Integer.parseInt(MyUtils.getTimeStamp()) + card.getSeconds());
                     } else {
                         //未到期，则续费
-                        userA.setAuthTime(Integer.valueOf(userA.getAuthTime()) + card.getSeconds());
+                        userA.setAuthTime(userA.getAuthTime() + card.getSeconds());
                     }
                 }
             }
         }
         plog.setAfterSeconds(userA.getAuthTime());
         //如果卡密包含点数
-        if (!card.getSeconds().equals(0)) {
+        if (!card.getPoint().equals(0)) {
             plog.setPoint(card.getPoint());
-            userA.setPoint(Integer.valueOf(userA.getPoint()) + card.getPoint());
+            userA.setPoint(userA.getPoint() + card.getPoint());
         }
         plog.setAfterPoint(userA.getPoint());
         plog.setFromUser(userA.getUser());
