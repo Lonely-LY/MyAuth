@@ -433,6 +433,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             //收费模式
             if (CheckUtils.isObjectEmpty(userA.getPass())) {
                 //密码为空
+                if (!CheckUtils.isObjectEmpty(userC.getCkey())){
+                    //卡密不为空
+                    if (!userA.getCkey().equals(userC.getCkey())){
+                        return Result.error("当前卡密和最后使用卡密不匹配");
+                    }
+                }
                 if (Integer.parseInt(MyUtils.getTimeStamp()) < userA.getAuthTime() || userA.getAuthTime().equals(-1)) {
                     //授权未到期
                     if (softC.getBindDeviceCode().equals(SoftEnums.BIND_ABLE.getCode())) {
@@ -490,6 +496,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 }
                 if (!userA.getPass().equals(userC.getPass())) {
                     return Result.error("密码错误");
+                }
+                if (!CheckUtils.isObjectEmpty(userC.getCkey())){
+                    //卡密不为空
+                    if (!userA.getCkey().equals(userC.getCkey())){
+                        return Result.error("当前卡密和最后使用卡密不匹配");
+                    }
                 }
                 if (Integer.parseInt(MyUtils.getTimeStamp()) < userA.getAuthTime() || userA.getAuthTime().equals(-1)) {
                     //授权未到期

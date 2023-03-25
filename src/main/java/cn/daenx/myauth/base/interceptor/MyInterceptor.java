@@ -77,9 +77,11 @@ public class MyInterceptor implements HandlerInterceptor {
                     return false;
                 }
                 Admin admin = (Admin) redisUtil.get("admin:" + token);
-                if (CheckUtils.isObjectEmpty(admin)) {
+                Admin adminA = adminMapper.selectById(admin);
+                if (CheckUtils.isObjectEmpty(admin) || !admin.getToken().equals(adminA.getToken())) {
                     log.info("接收->" + jsonObject.toJSONString());
                     String retStr = Result.error(402, "token无效，请重新登录").toJsonString();
+                    redisUtil.del("admin:" + token);
                     log.info("响应->" + retStr);
                     response.getWriter().write(retStr);
                     return false;
@@ -87,6 +89,7 @@ public class MyInterceptor implements HandlerInterceptor {
                 if (admin.getStatus().equals(AdminEnums.STATUS_DISABLE.getCode())) {
                     log.info("接收->" + jsonObject.toJSONString());
                     String retStr = Result.error(405, "账号已被禁用").toJsonString();
+                    redisUtil.del("admin:" + token);
                     log.info("响应->" + retStr);
                     response.getWriter().write(retStr);
                     return false;
@@ -94,6 +97,7 @@ public class MyInterceptor implements HandlerInterceptor {
                 if (admin.getLastTime() + AdminEnums.TOKEN_VALIDITY.getCode() < Integer.parseInt(MyUtils.getTimeStamp())) {
                     log.info("接收->" + jsonObject.toJSONString());
                     String retStr = Result.error(403, "登录状态失效，请重新登录").toJsonString();
+                    redisUtil.del("admin:" + token);
                     log.info("响应->" + retStr);
                     response.getWriter().write(retStr);
                     return false;
