@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -72,8 +73,12 @@ public class BanServiceImpl extends ServiceImpl<BanMapper, Ban> implements IBanS
         }
         IPage<Ban> msgPage = banMapper.selectPage(page, getQwBan(ban));
         for (int i = 0; i < msgPage.getRecords().size(); i++) {
-            Soft obj = (Soft) redisUtil.get("id:soft:" + msgPage.getRecords().get(i).getFromSoftId());
-            msgPage.getRecords().get(i).setFromSoftName(obj.getName());
+            if(msgPage.getRecords().get(i).getFromSoftId().equals(0)){
+                msgPage.getRecords().get(i).setFromSoftName("全局");
+            }else{
+                Soft obj = (Soft) redisUtil.get("id:soft:" + msgPage.getRecords().get(i).getFromSoftId());
+                msgPage.getRecords().get(i).setFromSoftName(obj.getName());
+            }
         }
         return Result.ok("获取成功", msgPage);
     }
@@ -123,9 +128,11 @@ public class BanServiceImpl extends ServiceImpl<BanMapper, Ban> implements IBanS
      */
     @Override
     public Result addBan(Ban ban) {
-        Soft soft = softMapper.selectById(ban.getFromSoftId());
-        if (CheckUtils.isObjectEmpty(soft)) {
-            return Result.error("fromSoftId错误");
+        if(!ban.getFromSoftId().equals(0)){
+            Soft soft = softMapper.selectById(ban.getFromSoftId());
+            if (CheckUtils.isObjectEmpty(soft)) {
+                return Result.error("fromSoftId错误");
+            }
         }
         LambdaQueryWrapper<Ban> banLambdaQueryWrapper = new LambdaQueryWrapper<>();
         banLambdaQueryWrapper.eq(Ban::getValue, ban.getValue());
@@ -140,7 +147,7 @@ public class BanServiceImpl extends ServiceImpl<BanMapper, Ban> implements IBanS
         if (num <= 0) {
             return Result.error("添加失败");
         }
-        redisUtil.set("ban:" + ban.getValue() + "-" + ban.getType() + "-" + soft.getId(),ban);
+        redisUtil.set("ban:" + ban.getValue() + "-" + ban.getType() + "-" + ban.getFromSoftId(),ban);
         return Result.ok("添加成功");
     }
 
@@ -163,5 +170,31 @@ public class BanServiceImpl extends ServiceImpl<BanMapper, Ban> implements IBanS
             }
         }
         return Result.ok("成功删除 " + okCount + " 个封禁");
+    }
+
+    /**
+     * 查询封禁，根据类型，信息
+     *
+     * @param type
+     * @param value
+     * @return
+     */
+    @Override
+    public Result getBanInfo(String type,String value){
+        LambdaQueryWrapper<Ban> banLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        banLambdaQueryWrapper.eq(Ban::getValue, value);
+        banLambdaQueryWrapper.eq(Ban::getType, type);
+        List<Ban> banList = banMapper.selectList(banLambdaQueryWrapper);
+        if(!CheckUtils.isObjectEmpty(banList)){
+            for (Ban ban : banList) {
+                if(ban.getFromSoftId().equals(0)){
+                    ban.setFromSoftName("全局");
+                }else{
+                    Soft obj = (Soft) redisUtil.get("id:soft:" + ban.getFromSoftId());
+                    ban.setFromSoftName(obj.getName());
+                }
+            }
+        }
+        return Result.ok("查询成功", banList);
     }
 }

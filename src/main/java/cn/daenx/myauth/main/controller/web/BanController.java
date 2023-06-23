@@ -48,9 +48,9 @@ public class BanController {
         if (CheckUtils.isObjectEmpty(myPage.getPageIndex()) || CheckUtils.isObjectEmpty(myPage.getPageSize())) {
             return Result.error("页码和尺寸参数不能为空");
         }
-        if (CheckUtils.isObjectEmpty(ban.getFromSoftId())) {
-            return Result.error("fromSoftId参数不能为空");
-        }
+//        if (CheckUtils.isObjectEmpty(ban.getFromSoftId())) {
+//            return Result.error("fromSoftId参数不能为空");
+//        }
         return banService.getBanList(ban, myPage);
     }
 

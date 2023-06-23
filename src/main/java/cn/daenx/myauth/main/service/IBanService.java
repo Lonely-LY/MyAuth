@@ -53,4 +53,13 @@ public interface IBanService extends IService<Ban> {
      * @return
      */
     Result delBan(String ids);
+
+    /**
+     * 查询封禁，根据类型，信息
+     *
+     * @param type
+     * @param value
+     * @return
+     */
+    Result getBanInfo(String type,String value);
 }

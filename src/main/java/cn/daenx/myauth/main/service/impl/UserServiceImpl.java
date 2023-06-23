@@ -305,8 +305,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LambdaQueryWrapper<Ban> banLambdaQueryWrapper = new LambdaQueryWrapper<>();
         banLambdaQueryWrapper.eq(Ban::getValue, userA.getUser());
         banLambdaQueryWrapper.eq(Ban::getType, 3);
-        banLambdaQueryWrapper.eq(Ban::getFromSoftId, softC.getId());
+        banLambdaQueryWrapper.eq(Ban::getFromSoftId, 0);
         Ban ban = banMapper.selectOne(banLambdaQueryWrapper);
+        if(CheckUtils.isObjectEmpty(ban)){
+            banLambdaQueryWrapper.clear();
+            banLambdaQueryWrapper.eq(Ban::getValue, userA.getUser());
+            banLambdaQueryWrapper.eq(Ban::getType, 3);
+            banLambdaQueryWrapper.eq(Ban::getFromSoftId, softC.getId());
+            ban = banMapper.selectOne(banLambdaQueryWrapper);
+        }
         if (!CheckUtils.isObjectEmpty(ban)) {
             if (ban.getToTime() == -1) {
                 String msg = "msg=被封禁" + "&type=user" + "&value=" + userA.getUser() + "&toTime=-1&time=" + ban.getAddTime()
@@ -673,8 +680,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LambdaQueryWrapper<Ban> banLambdaQueryWrapper = new LambdaQueryWrapper<>();
         banLambdaQueryWrapper.eq(Ban::getValue, userA.getUser());
         banLambdaQueryWrapper.eq(Ban::getType, 3);
-        banLambdaQueryWrapper.eq(Ban::getFromSoftId, softC.getId());
+        banLambdaQueryWrapper.eq(Ban::getFromSoftId, 0);
         Ban ban = banMapper.selectOne(banLambdaQueryWrapper);
+        if(CheckUtils.isObjectEmpty(ban)){
+            banLambdaQueryWrapper.clear();
+            banLambdaQueryWrapper.eq(Ban::getValue, userA.getUser());
+            banLambdaQueryWrapper.eq(Ban::getType, 3);
+            banLambdaQueryWrapper.eq(Ban::getFromSoftId, softC.getId());
+            ban = banMapper.selectOne(banLambdaQueryWrapper);
+        }
         if (!CheckUtils.isObjectEmpty(ban)) {
             if (ban.getToTime() == -1) {
                 String msg = "msg=被封禁" + "&type=user" + "&value=" + userA.getUser() + "&toTime=-1&time=" + ban.getAddTime()
@@ -981,8 +995,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LambdaQueryWrapper<Ban> banLambdaQueryWrapper = new LambdaQueryWrapper<>();
         banLambdaQueryWrapper.eq(Ban::getValue, userA.getUser());
         banLambdaQueryWrapper.eq(Ban::getType, 3);
-        banLambdaQueryWrapper.eq(Ban::getFromSoftId, softC.getId());
+        banLambdaQueryWrapper.eq(Ban::getFromSoftId, 0);
         Ban ban = banMapper.selectOne(banLambdaQueryWrapper);
+        if(CheckUtils.isObjectEmpty(ban)){
+            banLambdaQueryWrapper.clear();
+            banLambdaQueryWrapper.eq(Ban::getValue, userA.getUser());
+            banLambdaQueryWrapper.eq(Ban::getType, 3);
+            banLambdaQueryWrapper.eq(Ban::getFromSoftId, softC.getId());
+            ban = banMapper.selectOne(banLambdaQueryWrapper);
+        }
         if (!CheckUtils.isObjectEmpty(ban)) {
             if (ban.getToTime() == -1) {
                 String msg = "msg=被封禁" + "&type=user" + "&value=" + userA.getUser() + "&toTime=-1&time=" + ban.getAddTime()
@@ -1450,7 +1471,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             //密码和ckey都为空，说明免费软件，不允许修改账号
             return Result.error("当前账号类型无法修改账号");
         }
-        Ban ban = (Ban) redisUtil.get("ban:" + selectOne.getUser() + "-" + 3 + "-" + softId);
+        Ban ban = (Ban) redisUtil.get("ban:" + selectOne.getUser() + "-" + 3 + "-" + 0);
+        if(CheckUtils.isObjectEmpty(ban)){
+            ban = (Ban) redisUtil.get("ban:" + selectOne.getUser() + "-" + 3 + "-" + softId);
+        }
         if (!CheckUtils.isObjectEmpty(ban)) {
             if (ban.getToTime() == -1) {
                 return Result.error("账号已被永久封禁，不能修改");
@@ -1606,7 +1630,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         jsonObject.put("point", selectOne.getPoint());
         jsonObject.put("remark", selectOne.getRemark());
         jsonObject.put("fromSoftName", soft.getName());
-        Ban ban = (Ban) redisUtil.get("ban:" + selectOne.getUser() + "-" + 3 + "-" + soft.getId());
+        Ban ban = (Ban) redisUtil.get("ban:" + selectOne.getUser() + "-" + 3 + "-" + 0);
+        if (CheckUtils.isObjectEmpty(ban)){
+            ban = (Ban) redisUtil.get("ban:" + selectOne.getUser() + "-" + 3 + "-" + soft.getId());
+        }
         if (!CheckUtils.isObjectEmpty(ban)) {
             if (ban.getToTime() == -1) {
                 jsonObject.put("status", "账号已被永久封禁，封禁时间：" + MyUtils.dateToStr(MyUtils.stamp2Date(String.valueOf(ban.getAddTime()))) + "，封禁理由：" + ban.getWhy());
@@ -1702,8 +1729,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         LambdaQueryWrapper<Ban> banLambdaQueryWrapper = new LambdaQueryWrapper<>();
         banLambdaQueryWrapper.eq(Ban::getValue, userA.getUser());
         banLambdaQueryWrapper.eq(Ban::getType, 3);
-        banLambdaQueryWrapper.eq(Ban::getFromSoftId, softC.getId());
+        banLambdaQueryWrapper.eq(Ban::getFromSoftId, 0);
         Ban ban = banMapper.selectOne(banLambdaQueryWrapper);
+        if (CheckUtils.isObjectEmpty(ban)){
+            banLambdaQueryWrapper.clear();
+            banLambdaQueryWrapper.eq(Ban::getValue, userA.getUser());
+            banLambdaQueryWrapper.eq(Ban::getType, 3);
+            banLambdaQueryWrapper.eq(Ban::getFromSoftId, softC.getId());
+            ban = banMapper.selectOne(banLambdaQueryWrapper);
+        }
         if (!CheckUtils.isObjectEmpty(ban)) {
             if (ban.getToTime() == -1) {
                 String msg = "msg=被封禁" + "&type=user" + "&value=" + userA.getUser() + "&toTime=-1&time=" + ban.getAddTime()

@@ -4,6 +4,7 @@ package cn.daenx.myauth.main.controller;
 import cn.daenx.myauth.base.annotation.NoEncryptNoSign;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.Storage;
+import cn.daenx.myauth.main.service.IBanService;
 import cn.daenx.myauth.main.service.IConfigService;
 import cn.daenx.myauth.main.service.IStorageService;
 import cn.daenx.myauth.main.service.StatisService;
@@ -34,6 +35,8 @@ public class OpenApiController {
     private IConfigService configService;
     @Resource
     private IStorageService storageService;
+    @Resource
+    private IBanService banService;
 
     /**
      * 获取在线人数
@@ -201,5 +204,36 @@ public class OpenApiController {
             return Result.error("参数错误");
         }
         return storageService.getStorageListInfo(storage, type);
+    }
+
+    /**
+     * 查询封禁信息
+     *
+     * @param apikey
+     * @param type
+     * @param value
+     * @return
+     */
+    @NoEncryptNoSign
+    @GetMapping("getBanInfo")
+    public Result getBanInfo(String apikey,String type,String value) {
+        if (CheckUtils.isObjectEmpty(apikey)) {
+            return Result.error("apikey不能为空");
+        }
+        Integer apiKeyIsOk = configService.apiKeyIsOk(apikey);
+        if (apiKeyIsOk.equals(0)) {
+            return Result.error("apikey不正确");
+        }
+        if (apiKeyIsOk.equals(-1)) {
+            return Result.error("系统未设置apikey，无法使用开放接口");
+        }
+        if (CheckUtils.isObjectEmpty(type)) {
+            return Result.error("type不能为空");
+        }
+        if (CheckUtils.isObjectEmpty(value)) {
+            return Result.error("value不能为空");
+        }
+        return banService.getBanInfo(type,value);
+
     }
 }

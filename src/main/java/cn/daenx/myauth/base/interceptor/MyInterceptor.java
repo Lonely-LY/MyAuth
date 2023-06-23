@@ -325,7 +325,10 @@ public class MyInterceptor implements HandlerInterceptor {
                 BanValidated methodAnnotation = ((HandlerMethod) handler).getMethodAnnotation(BanValidated.class);
                 boolean is_ip = methodAnnotation.is_ip();
                 if (is_ip) {
-                    Ban ban = (Ban) redisUtil.get("ban:" + ip + "-" + 2 + "-" + soft.getId());
+                    Ban ban = (Ban) redisUtil.get("ban:" + ip + "-" + 2 + "-" + 0);
+                    if(CheckUtils.isObjectEmpty(ban)){
+                        ban = (Ban) redisUtil.get("ban:" + ip + "-" + 2 + "-" + soft.getId());
+                    }
                     if (!CheckUtils.isObjectEmpty(ban)) {
                         if (ban.getToTime() == -1) {
                             String msg = "msg=被封禁" + "&type=ip" + "&value=" + ip + "&toTime=-1&time=" + ban.getAddTime()
@@ -363,7 +366,10 @@ public class MyInterceptor implements HandlerInterceptor {
                         response.getWriter().write(retStr);
                         return false;
                     }
-                    Ban ban = (Ban) redisUtil.get("ban:" + device_code + "-" + 1 + "-" + soft.getId());
+                    Ban ban = (Ban) redisUtil.get("ban:" + device_code + "-" + 1 + "-" + 0);
+                    if (CheckUtils.isObjectEmpty(ban)){
+                        ban = (Ban) redisUtil.get("ban:" + device_code + "-" + 1 + "-" + soft.getId());
+                    }
                     if (!CheckUtils.isObjectEmpty(ban)) {
                         if (ban.getToTime() == -1) {
                             String msg = "msg=被封禁" + "&type=device_code" + "&value=" + device_code + "&toTime=-1&time=" + ban.getAddTime()
@@ -389,7 +395,10 @@ public class MyInterceptor implements HandlerInterceptor {
                 if (is_user) {
                     User user = (User) request.getAttribute("obj_user");
                     if (!CheckUtils.isObjectEmpty(user)) {
-                        Ban ban = (Ban) redisUtil.get("ban:" + user.getUser() + "-" + 3 + "-" + soft.getId());
+                        Ban ban = (Ban) redisUtil.get("ban:" + user.getUser() + "-" + 3 + "-" + 0);
+                        if (CheckUtils.isObjectEmpty(ban)){
+                            ban = (Ban) redisUtil.get("ban:" + user.getUser() + "-" + 3 + "-" + soft.getId());
+                        }
                         if (!CheckUtils.isObjectEmpty(ban)) {
                             if (ban.getToTime() == -1) {
                                 String msg = "msg=被封禁" + "&type=user" + "&value=" + user.getUser() + "&toTime=-1&time=" + ban.getAddTime()
