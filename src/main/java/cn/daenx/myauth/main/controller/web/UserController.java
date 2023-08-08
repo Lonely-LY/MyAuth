@@ -1,5 +1,6 @@
 package cn.daenx.myauth.main.controller.web;
 
+import cn.daenx.myauth.main.entity.Soft;
 import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.base.annotation.AdminLogin;
 import cn.daenx.myauth.base.annotation.NoEncryptNoSign;
@@ -195,5 +196,50 @@ public class UserController {
             return Result.error("页码和尺寸参数不能为空");
         }
         return userService.getMyUserList(user, myPage, admin);
+    }
+
+    /**
+     * 查询用户在线信息
+     *
+     */
+    @NoEncryptNoSign
+    @AdminLogin
+    @PostMapping("queryUserOnlineInfo")
+    public Result queryUserOnlineInfo(HttpServletRequest request) {
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+        User user = jsonObject.toJavaObject(User.class);
+        if (CheckUtils.isObjectEmpty(user)) {
+            return Result.error("参数错误");
+        }
+        return userService.queryUserOnlineInfo(user);
+    }
+
+    /**
+     * 按条件批量操作用户授权
+     *
+     * @param request
+     * @return
+     */
+    @NoEncryptNoSign
+    @AdminLogin
+    @PostMapping("updateUserAuthInfo")
+    public Result updateUserAuthInfo(HttpServletRequest request){
+        JSONObject jsonObject = (JSONObject) request.getAttribute("json");
+
+        Integer fromSoftId = jsonObject.getInteger("fromSoftId");
+
+        Integer minPoint = jsonObject.getInteger("minPoint");
+        Integer maxPoint = jsonObject.getInteger("maxPoint");
+
+        Integer minAuthTime = jsonObject.getInteger("minAuthTime");
+        Integer maxAuthTime = jsonObject.getInteger("maxAuthTime");
+
+        Integer minRegTime = jsonObject.getInteger("minRegTime");
+        Integer maxRegTime = jsonObject.getInteger("maxRegTime");
+
+        Integer updPoint = jsonObject.getInteger("updPoint");
+        Integer updAuthTime = jsonObject.getInteger("updAuthTime");
+
+        return userService.updateUserAuthInfo(fromSoftId,minPoint,maxPoint,minAuthTime,maxAuthTime,minRegTime,maxRegTime,updPoint,updAuthTime);
     }
 }

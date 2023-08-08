@@ -24,6 +24,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -68,6 +72,33 @@ public class EventServiceImpl extends ServiceImpl<EventMapper, Event> implements
         }
         if (event.getStatus().equals(EventEnums.STATUS_DISABLE.getCode())) {
             return Result.error("事件已被禁用");
+        }
+        if(!event.getStartTime().equals(0) && Integer.parseInt(MyUtils.getTimeStamp()) < event.getStartTime()){
+            return Result.error("事件还未到使用日期");
+        }
+        if(!event.getEndTime().equals(0) && Integer.parseInt(MyUtils.getTimeStamp()) > event.getEndTime()){
+            return Result.error("事件已超过使用日期");
+        }
+
+        LambdaQueryWrapper<Plog> plogLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        plogLambdaQueryWrapper.eq(Plog::getFromUser, user.getUser());
+        plogLambdaQueryWrapper.eq(Plog::getFromEventName, event.getName());
+        Long count =  plogMapper.selectCount(plogLambdaQueryWrapper);
+        if(!event.getAllCount().equals(0) && count >= event.getAllCount()){
+            return Result.error("事件已超过总共可使用次数");
+        }
+        //获取当天开始时间
+        LocalDateTime today_start = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);//当天零点
+        //获取当天结束时间
+        LocalDateTime today_end = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);//当天24点
+        //获取秒数  10位
+        long start_time = today_start.toInstant(ZoneOffset.ofHours(8)).getEpochSecond();
+        long end_time = today_end.toInstant(ZoneOffset.ofHours(8)).getEpochSecond();
+        plogLambdaQueryWrapper.ge(Plog::getAddTime, start_time);
+        plogLambdaQueryWrapper.le(Plog::getAddTime, end_time);
+        Long count1 =  plogMapper.selectCount(plogLambdaQueryWrapper);
+        if(!event.getDayCount().equals(0) && count1 >= event.getDayCount()){
+            return Result.error("事件已超过当日可使用次数");
         }
         plog.setPoint(event.getPoint());
         if (event.getPoint() != 0) {

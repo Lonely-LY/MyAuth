@@ -185,11 +185,15 @@ public class MyUtils {
      * @param genKey
      * @return
      */
-    public static String encUserToken(String user, String time, String softId, String genKey) {
+    public static String encUserToken(String user, String time, String lastIp, String deviceInfo, String deviceCode, String fromVerKey, String softId, String genKey) {
         int kk = (int) (1000000 + Math.random() * 9999999);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", user);
         jsonObject.put("time", time);
+        jsonObject.put("lastIp", lastIp);
+        jsonObject.put("deviceInfo", deviceInfo);
+        jsonObject.put("deviceCode", deviceCode);
+        jsonObject.put("fromVerKey", fromVerKey);
         jsonObject.put("softId", softId);
         jsonObject.put("radom", String.valueOf(kk));
         String encrypt = AESUtils.encrypt(jsonObject.toJSONString(), genKey);
@@ -296,7 +300,7 @@ public class MyUtils {
         Date date = null;
 
         try {
-            date = sdf.parse(sdf.format(new Long(timeStamp) * 1000));
+            date = sdf.parse(sdf.format(Long.parseLong(timeStamp) * 1000));
         } catch (ParseException e) {
             e.printStackTrace();
         }

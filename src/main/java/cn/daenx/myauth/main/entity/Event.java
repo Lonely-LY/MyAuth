@@ -55,4 +55,12 @@ public class Event extends Model {
      */
     @TableField(exist = false)
     private String fromSoftName;
+
+    private Integer dayCount;
+
+    private Integer allCount;
+
+    private Integer startTime;
+
+    private Integer endTime;
 }

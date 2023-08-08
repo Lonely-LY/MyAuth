@@ -193,6 +193,8 @@ public class BanServiceImpl extends ServiceImpl<BanMapper, Ban> implements IBanS
                     Soft obj = (Soft) redisUtil.get("id:soft:" + ban.getFromSoftId());
                     ban.setFromSoftName(obj.getName());
                 }
+                ban.setId(null);
+                ban.setFromSoftId(null);
             }
         }
         return Result.ok("查询成功", banList);

@@ -1,5 +1,6 @@
 package cn.daenx.myauth.main.controller;
 
+import cn.daenx.myauth.main.entity.Config;
 import cn.daenx.myauth.main.service.*;
 import cn.daenx.myauth.util.CheckUtils;
 import cn.daenx.myauth.util.IpUtil;
@@ -105,6 +106,10 @@ public class WebApiController {
         JSONObject jsonObject = (JSONObject) request.getAttribute("json");
         User user = jsonObject.toJavaObject(User.class);
         Soft softC = jsonObject.toJavaObject(Soft.class);
+        Config config = (Config) redisUtil.get("config");
+        if(config.getSelfRegisterStatus().equals(0)){
+            return Result.error("暂未开启自助注册功能");
+        }
         if (CheckUtils.isObjectEmpty(user)) {
             return Result.error("参数错误");
         }
@@ -150,6 +155,10 @@ public class WebApiController {
         String pass = jsonObject.getString("pass");
         String skey = jsonObject.getString("skey");
         String ckey = jsonObject.getString("ckey");
+        Config config = (Config) redisUtil.get("config");
+        if(config.getSelfChangeUserStatus().equals(0)){
+            return Result.error("暂未开启自助修改账号功能");
+        }
         if (CheckUtils.isObjectEmpty(user)) {
             return Result.error("原账号不能为空");
         }
@@ -188,6 +197,10 @@ public class WebApiController {
         String user = jsonObject.getString("user");
         String skey = jsonObject.getString("skey");
         String ckey = jsonObject.getString("ckey");
+        Config config = (Config) redisUtil.get("config");
+        if(config.getSelfUseCkeyStatus().equals(0)){
+            return Result.error("暂未开启自助使用卡密功能");
+        }
         if (CheckUtils.isObjectEmpty(user)) {
             return Result.error("账号不能为空");
         }
@@ -225,7 +238,10 @@ public class WebApiController {
         String ckey = jsonObject.getString("ckey");
         String pass = jsonObject.getString("pass");
         String skey = jsonObject.getString("skey");
-
+        Config config = (Config) redisUtil.get("config");
+        if(config.getSelfUnbindStatus().equals(0)){
+            return Result.error("暂未开启自助解绑功能");
+        }
         if (CheckUtils.isObjectEmpty(user)) {
             return Result.error("账号不能为空");
         }

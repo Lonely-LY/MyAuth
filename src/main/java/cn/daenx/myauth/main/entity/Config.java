@@ -38,4 +38,12 @@ public class Config extends Model {
      * 开放接口key
      */
     private String openApiKey;
+
+    private Integer selfRegisterStatus;
+
+    private Integer selfChangeUserStatus;
+
+    private Integer selfUseCkeyStatus;
+
+    private Integer selfUnbindStatus;
 }

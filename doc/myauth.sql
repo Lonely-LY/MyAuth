@@ -147,6 +147,10 @@ CREATE TABLE `ma_config`  (
   `seo_keywords` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `seo_description` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL,
   `open_api_key` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '开放接口key',
+  `self_register_status` int(2) NULL DEFAULT 0 COMMENT '自助注册开关',
+  `self_change_user_status` int(2) NULL DEFAULT 0 COMMENT '自助修改账号开关',
+  `self_use_ckey_status` int(2) NULL DEFAULT 0 COMMENT '自助使用卡密开关',
+  `self_unbind_status` int(2) NULL DEFAULT 0 COMMENT '自助解绑开关',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
@@ -232,6 +236,10 @@ CREATE TABLE `ma_event`  (
   `add_time` int(10) NULL DEFAULT NULL,
   `status` int(2) NULL DEFAULT 1 COMMENT '0=禁用，1=正常',
   `from_soft_id` int(11) NULL DEFAULT NULL,
+  `day_count` int(11) NULL DEFAULT 0 COMMENT '每日限制次数，0为不限制',
+  `all_count` int(11) NULL DEFAULT 0 COMMENT '总共限制次数，0为不限制',
+  `start_time` int(10) NULL DEFAULT 0 COMMENT '限制触发日期开始，0为不限制',
+  `end_time` int(10) NULL DEFAULT 0 COMMENT '限制触发日期结束，0为不限制',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 

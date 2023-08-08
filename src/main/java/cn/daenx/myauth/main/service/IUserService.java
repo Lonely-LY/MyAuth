@@ -199,4 +199,27 @@ public interface IUserService extends IService<User> {
      * @return
      */
     boolean queryUserPassCKey(String user , String pass , String ckey , Soft soft);
+
+    /**
+     * 查询用户在线信息
+     *
+     * @param user
+     * @return
+     */
+    Result queryUserOnlineInfo(User user);
+
+    /**
+     * 按条件批量操作用户授权
+     *
+     * @param minPoint
+     * @param maxPoint
+     * @param minAuthTime
+     * @param maxAuthTime
+     * @param minRegTime
+     * @param maxRegTime
+     * @param updPoint
+     * @param updAuthTime
+     * @return
+     */
+    Result updateUserAuthInfo(Integer fromSoftId , Integer minPoint , Integer maxPoint , Integer minAuthTime , Integer maxAuthTime , Integer minRegTime , Integer maxRegTime , Integer updPoint , Integer updAuthTime);
 }

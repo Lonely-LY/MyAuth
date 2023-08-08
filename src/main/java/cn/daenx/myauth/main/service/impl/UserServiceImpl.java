@@ -13,6 +13,7 @@ import cn.daenx.myauth.main.enums.MsgEnums;
 import cn.daenx.myauth.main.enums.SoftEnums;
 import cn.daenx.myauth.main.service.IUserService;
 import cn.daenx.myauth.util.TemplateParseUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -365,7 +366,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                 }
 
-                String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), String.valueOf(softC.getId()), genKey);
+                String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), userA.getLastIp(), userA.getDeviceInfo(), userA.getDeviceCode(), userA.getFromVerKey(), String.valueOf(softC.getId()), genKey);
                 userA.setToken(token);
                 int num = userMapper.updateById(userA);
                 if (num > 0) {
@@ -417,7 +418,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                     }
                 }
 
-                String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), String.valueOf(softC.getId()), genKey);
+                String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), userA.getLastIp(), userA.getDeviceInfo(), userA.getDeviceCode(), userA.getFromVerKey(), String.valueOf(softC.getId()), genKey);
                 userA.setToken(token);
                 int num = userMapper.updateById(userA);
                 if (num > 0) {
@@ -475,7 +476,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         }
                     }
 
-                    String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), String.valueOf(softC.getId()), genKey);
+                    String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), userA.getLastIp(), userA.getDeviceInfo(), userA.getDeviceCode(), userA.getFromVerKey(), String.valueOf(softC.getId()), genKey);
                     userA.setToken(token);
                     int num = userMapper.updateById(userA);
                     if (num > 0) {
@@ -539,7 +540,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         }
                     }
 
-                    String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), String.valueOf(softC.getId()), genKey);
+                    String token = MyUtils.encUserToken(userA.getUser(), String.valueOf(userA.getLastTime()), userA.getLastIp(), userA.getDeviceInfo(), userA.getDeviceCode(), userA.getFromVerKey(), String.valueOf(softC.getId()), genKey);
                     userA.setToken(token);
                     int num = userMapper.updateById(userA);
                     if (num > 0) {
@@ -1755,5 +1756,80 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         JSONObject jsonObject = new JSONObject(true);
         jsonObject.put("user", userA.getUser());
         return Result.ok("账号正常", jsonObject);
+    }
+
+    /**
+     * 查询用户在线信息
+     *
+     * @param user
+     * @return
+     */
+    @Override
+    public Result queryUserOnlineInfo(User user){
+        Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + ":*");
+        List<User> users = new ArrayList<>();
+        for (String s : scan) {
+            User user1 = (User) redisUtil.get(s);
+            Version obj = (Version) redisUtil.get("id:version:" + user1.getFromVerId());
+            user1.setFromVerName(obj.getVer());
+//            user1.setFromSoftId(null);
+//            user1.setFromSoftKey(null);
+//            user1.setFromVerId(null);
+//            user1.setFromVerKey(null);
+            users.add(user1);
+        }
+        return Result.ok("获取成功", users);
+    }
+
+    /**
+     * 获取查询条件构造器_授权条件
+     *
+     * @param minPoint
+     * @param maxPoint
+     * @param minAuthTime
+     * @param maxAuthTime
+     * @param minRegTime
+     * @param maxRegTime
+     * @return
+     */
+    public LambdaQueryWrapper<User> getQwUserAuth(Integer fromSoftId , Integer minPoint , Integer maxPoint , Integer minAuthTime , Integer maxAuthTime , Integer minRegTime , Integer maxRegTime) {
+        LambdaQueryWrapper<User> LambdaQueryWrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper.eq(!CheckUtils.isObjectEmpty(fromSoftId) ,User::getFromSoftId , fromSoftId);
+        LambdaQueryWrapper.ge(!CheckUtils.isObjectEmpty(minPoint) ,User::getPoint , minPoint);
+        LambdaQueryWrapper.le(!CheckUtils.isObjectEmpty(maxPoint) ,User::getPoint , maxPoint);
+        LambdaQueryWrapper.ge(!CheckUtils.isObjectEmpty(minAuthTime) ,User::getAuthTime , minAuthTime);
+        LambdaQueryWrapper.le(!CheckUtils.isObjectEmpty(maxAuthTime) ,User::getAuthTime , maxAuthTime);
+        LambdaQueryWrapper.ge(!CheckUtils.isObjectEmpty(minRegTime) ,User::getRegTime , minRegTime);
+        LambdaQueryWrapper.le(!CheckUtils.isObjectEmpty(maxRegTime) ,User::getRegTime , maxRegTime);
+        return LambdaQueryWrapper;
+    }
+
+    /**
+     * 按条件批量操作用户授权
+     *
+     * @param minPoint
+     * @param maxPoint
+     * @param minAuthTime
+     * @param maxAuthTime
+     * @param minRegTime
+     * @param maxRegTime
+     * @param updPoint
+     * @param updAuthTime
+     * @return
+     */
+    @Override
+    public Result updateUserAuthInfo(Integer fromSoftId , Integer minPoint , Integer maxPoint , Integer minAuthTime , Integer maxAuthTime , Integer minRegTime , Integer maxRegTime , Integer updPoint , Integer updAuthTime){
+        List<User> users = userMapper.selectList(getQwUserAuth(fromSoftId,minPoint,maxPoint,minAuthTime,maxAuthTime,minRegTime,maxRegTime));
+        int num = 0;
+        for (User user : users) {
+            if(!CheckUtils.isObjectEmpty(updPoint)){
+                user.setPoint(Integer.sum(user.getPoint(),updPoint));
+            }
+            if(!CheckUtils.isObjectEmpty(updAuthTime) && !user.getAuthTime().equals(-1)){
+                user.setAuthTime(Integer.sum(user.getAuthTime(),updAuthTime));
+            }
+            num += userMapper.updateById(user);
+        }
+        return Result.ok("操作成功,符合条件数量:" + num);
     }
 }
