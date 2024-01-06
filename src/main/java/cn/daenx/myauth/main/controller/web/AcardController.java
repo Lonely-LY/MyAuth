@@ -2,6 +2,7 @@ package cn.daenx.myauth.main.controller.web;
 
 
 import cn.daenx.myauth.base.annotation.AdminLogin;
+import cn.daenx.myauth.base.vo.AcardExportVo;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.Acard;
 import cn.daenx.myauth.main.entity.Admin;
@@ -9,11 +10,10 @@ import cn.daenx.myauth.main.entity.Role;
 import cn.daenx.myauth.main.service.IAcardService;
 import cn.daenx.myauth.main.service.IAdminService;
 import cn.daenx.myauth.util.CheckUtils;
-import cn.daenx.myauth.util.ExportXls;
+import cn.daenx.myauth.util.ExcelUtil;
 import cn.daenx.myauth.util.RedisUtil;
 import cn.daenx.myauth.base.annotation.NoEncryptNoSign;
 import cn.daenx.myauth.base.vo.MyPage;
-import cn.daenx.myauth.main.entity.*;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -203,19 +203,14 @@ public class AcardController {
     /**
      * 导出卡密
      *
-     * @param ckey
-     * @param money
-     * @param addTime
-     * @param letTime
-     * @param letUser
-     * @param status
+     * @param acard
      * @param request
      * @param response
      * @throws IOException
      */
     @NoEncryptNoSign
     @GetMapping("exportACard")
-    public void exportACard(String token, String ckey, String money, Integer addTime, Integer letTime, String letUser, Integer status, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void exportACard(String token, Acard acard, HttpServletRequest request, HttpServletResponse response) throws IOException {
         Admin admin = adminService.tokenIsOk(token);
         if (CheckUtils.isObjectEmpty(admin)) {
             return;
@@ -224,18 +219,11 @@ public class AcardController {
         if (!role.getFromSoftId().equals("0")) {
             return;
         }
-        Acard acard = new Acard();
-        acard.setCkey(ckey);
-        acard.setMoney(money);
-        acard.setAddTime(addTime);
-        acard.setLetTime(letTime);
-        acard.setLetUser(letUser);
-        acard.setStatus(status);
         if (CheckUtils.isObjectEmpty(acard)) {
             return;
         }
-        List<Acard> acardList = acardService.exportACard(acard);
-        ExportXls.exportACard2Xls(request, response, "exportACard", acardList);
+        List<AcardExportVo> acardExportVos = acardService.exportACardVO(acard);
+        ExcelUtil.exportXlsx(request,response, "卡密导出", "卡密列表", acardExportVos, AcardExportVo.class);
         return;
     }
 

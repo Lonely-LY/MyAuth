@@ -1,5 +1,7 @@
 package cn.daenx.myauth.main.service.impl;
 
+import cn.daenx.myauth.base.vo.AcardExportVo;
+import cn.daenx.myauth.base.vo.CardExportVo;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.Acard;
 import cn.daenx.myauth.main.entity.Admin;
@@ -14,6 +16,7 @@ import cn.daenx.myauth.util.RedisUtil;
 import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.main.entity.*;
 import cn.daenx.myauth.main.mapper.*;
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -260,6 +263,19 @@ public class AcardServiceImpl extends ServiceImpl<AcardMapper, Acard> implements
             }
         }
         return acardList;
+    }
+
+    /**
+     * 导出卡密
+     *
+     * @param acard
+     * @return
+     */
+    @Override
+    public List<AcardExportVo> exportACardVO(Acard acard) {
+        List<Acard> list = exportACard(acard);
+        List<AcardExportVo> acardExportVos = BeanUtil.copyToList(list, AcardExportVo.class);
+        return acardExportVos;
     }
 
     /**

@@ -1,6 +1,9 @@
 package cn.daenx.myauth.main.controller.web;
 
+import cn.daenx.myauth.base.vo.CardExportVo;
+import cn.daenx.myauth.main.entity.Role;
 import cn.daenx.myauth.util.CheckUtils;
+import cn.daenx.myauth.util.ExcelUtil;
 import cn.daenx.myauth.util.ExportXls;
 import cn.daenx.myauth.base.annotation.AdminLogin;
 import cn.daenx.myauth.base.annotation.NoEncryptNoSign;
@@ -10,6 +13,7 @@ import cn.daenx.myauth.main.entity.Card;
 import cn.daenx.myauth.base.vo.MyPage;
 import cn.daenx.myauth.main.service.IAdminService;
 import cn.daenx.myauth.main.service.ICardService;
+import cn.daenx.myauth.util.RedisUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,48 +40,35 @@ public class CardController {
     private ICardService cardService;
     @Resource
     private IAdminService adminService;
+    @Resource
+    private RedisUtil redisUtil;
 
 
     /**
      * 导出卡密
      *
-     * @param ckey
-     * @param point
-     * @param seconds
-     * @param addTime
-     * @param letTime
-     * @param letUser
-     * @param status
-     * @param fromSoftId
+     * @param token
+     * @param card
      * @param request
      * @param response
      * @throws IOException
      */
     @NoEncryptNoSign
     @GetMapping("exportCard")
-    public void exportCard(String token, String ckey, Integer point, Integer seconds, Integer addTime, Integer letTime, String letUser, Integer status, Integer fromSoftId, Integer fromAdminId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void exportCard(String token, Card card, HttpServletRequest request, HttpServletResponse response) {
         Admin admin = adminService.tokenIsOk(token);
-        if(CheckUtils.isObjectEmpty(admin)){
+        if (CheckUtils.isObjectEmpty(admin)) {
             return;
         }
-        Card card = new Card();
-        card.setCkey(ckey);
-        card.setPoint(point);
-        card.setSeconds(seconds);
-        card.setAddTime(addTime);
-        card.setLetTime(letTime);
-        card.setLetUser(letUser);
-        card.setStatus(status);
-        card.setFromSoftId(fromSoftId);
-        card.setFromAdminId(fromAdminId);
         if (CheckUtils.isObjectEmpty(card)) {
             return;
         }
-        if (CheckUtils.isObjectEmpty(card.getFromSoftId())) {
-            return;
+        Role role = (Role) redisUtil.get("role:" + admin.getRole());
+        if (!role.getFromSoftId().equals("0")) {
+            card.setFromAdminId(admin.getId());
         }
-        List<Card> cardList = cardService.exportCard(card);
-        ExportXls.exportCard2Xls(request, response, "exportCard", cardList);
+        List<CardExportVo> cardExportVos = cardService.exportCardVO(card);
+        ExcelUtil.exportXlsx(request,response, "卡密导出", "卡密列表", cardExportVos, CardExportVo.class);
         return;
     }
 

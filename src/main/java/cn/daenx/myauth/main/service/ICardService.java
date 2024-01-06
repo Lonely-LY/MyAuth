@@ -1,5 +1,6 @@
 package cn.daenx.myauth.main.service;
 
+import cn.daenx.myauth.base.vo.CardExportVo;
 import cn.daenx.myauth.main.entity.Admin;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.Card;
@@ -24,6 +25,14 @@ public interface ICardService extends IService<Card> {
      * @return
      */
     List<Card> exportCard(Card card);
+
+    /**
+     * 导出卡密
+     *
+     * @param card
+     * @return
+     */
+    List<CardExportVo> exportCardVO(Card card);
 
     /**
      * 获取卡密列表

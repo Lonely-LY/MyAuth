@@ -1,5 +1,6 @@
 package cn.daenx.myauth.main.service.impl;
 
+import cn.daenx.myauth.base.vo.CardExportVo;
 import cn.daenx.myauth.main.entity.*;
 import cn.daenx.myauth.main.mapper.*;
 import cn.daenx.myauth.util.CheckUtils;
@@ -11,6 +12,9 @@ import cn.daenx.myauth.main.entity.*;
 import cn.daenx.myauth.main.enums.CardEnums;
 import cn.daenx.myauth.main.mapper.*;
 import cn.daenx.myauth.main.service.ICardService;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -20,6 +24,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -89,6 +94,19 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, Card> implements IC
             }
         }
         return cardList;
+    }
+
+    /**
+     * 导出卡密
+     *
+     * @param card
+     * @return
+     */
+    @Override
+    public List<CardExportVo> exportCardVO(Card card) {
+        List<Card> list = exportCard(card);
+        List<CardExportVo> cardExportVos = BeanUtil.copyToList(list, CardExportVo.class);
+        return cardExportVos;
     }
 
     /**

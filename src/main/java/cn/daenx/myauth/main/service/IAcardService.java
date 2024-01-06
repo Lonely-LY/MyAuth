@@ -1,9 +1,12 @@
 package cn.daenx.myauth.main.service;
 
+import cn.daenx.myauth.base.vo.AcardExportVo;
+import cn.daenx.myauth.base.vo.CardExportVo;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.Admin;
 import cn.daenx.myauth.main.entity.Acard;
 import cn.daenx.myauth.base.vo.MyPage;
+import cn.daenx.myauth.main.entity.Card;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -83,6 +86,14 @@ public interface IAcardService extends IService<Acard> {
      * @return
      */
     List<Acard> exportACard(Acard acard);
+
+    /**
+     * 导出卡密
+     *
+     * @param acard
+     * @return
+     */
+    List<AcardExportVo> exportACardVO(Acard acard);
 
     /**
      * 使用代理卡密
