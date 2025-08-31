@@ -1829,6 +1829,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 user.setAuthTime(Integer.sum(user.getAuthTime(),updAuthTime));
             }
             num += userMapper.updateById(user);
+            Set<String> scan = redisUtil.scan("user:" + user.getFromSoftId() + ":" + user.getUser() + ":*");
+            Soft obj = (Soft) redisUtil.get("id:soft:" + user.getFromSoftId());
+            if(scan.size() > 0){
+                for (String s : scan) {
+                    redisUtil.set(s, user, obj.getHeartTime());
+                }
+            }
         }
         return Result.ok("操作成功,符合条件数量:" + num);
     }
