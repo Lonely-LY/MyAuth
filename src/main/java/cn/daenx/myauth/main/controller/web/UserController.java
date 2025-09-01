@@ -228,6 +228,10 @@ public class UserController {
 
         Integer fromSoftId = jsonObject.getInteger("fromSoftId");
 
+        if (CheckUtils.isObjectEmpty(fromSoftId)) {
+            return Result.error("软件ID参数不能为空");
+        }
+
         Integer minPoint = jsonObject.getInteger("minPoint");
         Integer maxPoint = jsonObject.getInteger("maxPoint");
 
