@@ -4,10 +4,8 @@ package cn.daenx.myauth.main.controller;
 import cn.daenx.myauth.base.annotation.NoEncryptNoSign;
 import cn.daenx.myauth.base.vo.Result;
 import cn.daenx.myauth.main.entity.Storage;
-import cn.daenx.myauth.main.service.IBanService;
-import cn.daenx.myauth.main.service.IConfigService;
-import cn.daenx.myauth.main.service.IStorageService;
-import cn.daenx.myauth.main.service.StatisService;
+import cn.daenx.myauth.main.entity.User;
+import cn.daenx.myauth.main.service.*;
 import cn.daenx.myauth.util.CheckUtils;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +35,8 @@ public class OpenApiController {
     private IStorageService storageService;
     @Resource
     private IBanService banService;
+    @Resource
+    private IUserService userService;
 
     /**
      * 获取在线人数
@@ -62,6 +62,41 @@ public class OpenApiController {
         }
         return statisService.getOnlineUserCount(skey);
     }
+
+    /**
+     * 获取用户在线信息
+     *
+     * @param apikey
+     * @param fromSoftId
+     * @param user
+     * @return
+     */
+    @NoEncryptNoSign
+    @GetMapping("/getUserOnlineInfo")
+    public Result getUserOnlineInfo(String apikey, Integer fromSoftId, String user) {
+        if (CheckUtils.isObjectEmpty(apikey)) {
+            return Result.error("apikey不能为空");
+        }
+        if (CheckUtils.isObjectEmpty(fromSoftId)) {
+            return Result.error("fromSoftId不能为空");
+        }
+        if (CheckUtils.isObjectEmpty(user)) {
+            return Result.error("user不能为空");
+        }
+        Integer apiKeyIsOk = configService.apiKeyIsOk(apikey);
+        if (apiKeyIsOk.equals(-1)) {
+            return Result.error("系统未设置apikey，无法使用开放接口");
+        }
+        if (apiKeyIsOk.equals(0)) {
+            return Result.error("apikey不正确");
+        }
+
+        User user1 = new User();
+        user1.setFromSoftId(fromSoftId);
+        user1.setUser(user);
+        return userService.queryUserOnlineInfo(user1);
+    }
+
 
     /**
      * 获取用户总数
